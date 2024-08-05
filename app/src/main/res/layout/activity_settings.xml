@@ -29,6 +29,7 @@
             android:paddingRight="@dimen/setting_title_padding"
             android:textSize="@dimen/setting_title_text_size"
             android:textStyle="bold"
+            android:textColor="@color/text"
             android:text="@string/settings"/>
     </LinearLayout>
     <LinearLayout
@@ -45,6 +46,7 @@
             android:paddingBottom="@dimen/setting_padding_tb"
             android:gravity="start"
             android:textSize="@dimen/setting_item_text_size"
+            android:textColor="@color/settings_text"
             android:text="@string/dark_theme"/>
         <Switch
             android:layout_width="56dp"
@@ -65,6 +67,7 @@
             android:paddingBottom="@dimen/setting_padding_tb"
             android:gravity="start"
             android:textSize="@dimen/setting_item_text_size"
+            android:textColor="@color/settings_text"
             android:text="@string/share_invitation"/>
         <ImageView
             android:layout_width="@dimen/icon_size"
@@ -87,6 +90,7 @@
             android:paddingBottom="@dimen/setting_padding_tb"
             android:gravity="start"
             android:textSize="@dimen/setting_item_text_size"
+            android:textColor="@color/settings_text"
             android:text="@string/connect_to_support"/>
         <ImageView
             android:layout_width="@dimen/icon_size"
@@ -109,6 +113,7 @@
             android:paddingBottom="@dimen/setting_padding_tb"
             android:gravity="start"
             android:textSize="@dimen/setting_item_text_size"
+            android:textColor="@color/settings_text"
             android:text="@string/terms_of_use"/>
         <ImageView
             android:layout_width="@dimen/icon_size"

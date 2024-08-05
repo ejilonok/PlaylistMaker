@@ -2,12 +2,12 @@
     <!-- Название приложения -->
     <string name="app_name" translatable="false">Playlist maker</string>
     <!-- Пункты главного меню -->
-    <string name="search" translatable="true">Поиск</string>
-    <string name="library" translatable="true">Медиатека</string>
-    <string name="settings" translatable="true">Настройки</string>
+    <string name="search">Поиск</string>
+    <string name="library">Медиатека</string>
+    <string name="settings">Настройки</string>
     <!-- Пункты меню настроек -->
-    <string name="dark_theme" translatable="true">Темная тема</string>
-    <string name="share_invitation" translatable="true">Поделиться приложением</string>
-    <string name="connect_to_support" translatable="true">Написать в поддержку</string>
-    <string name="terms_of_use" translatable="true">Пользовательское соглашение</string>
+    <string name="dark_theme">Темная тема</string>
+    <string name="share_invitation">Поделиться приложением</string>
+    <string name="connect_to_support">Написать в поддержку</string>
+    <string name="terms_of_use">Пользовательское соглашение</string>
 </resources>

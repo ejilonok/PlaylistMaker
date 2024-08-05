@@ -7,5 +7,6 @@
     <color name="appName">#FFFFFF</color>
     <color name="text">#1A1B22</color>
     <color name="icon">#1A1B22</color>
+    <color name="settings_text">#000000</color>
     <color name="button">#FFFFFF</color>
 </resources>
