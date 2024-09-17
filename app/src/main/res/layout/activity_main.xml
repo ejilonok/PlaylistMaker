@@ -10,92 +10,30 @@
     android:background="@color/main_background">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/main_title_text_size"
-        android:textColor="@color/appName"
+        style="@style/MainTitleStyle"
         android:text="@string/app_name"
-        android:paddingTop="10dp"
-        android:layout_marginTop="@dimen/title_margin"
-        android:layout_marginBottom="40dp"/>
+        />
 
-    <LinearLayout
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/ButtonStyle"
         android:id="@+id/search_button"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:background="@drawable/rounded"
-        android:layout_marginBottom="@dimen/main_padding">
+        app:icon="@drawable/search"
+        android:text="@string/search"
+        />
 
-        <ImageView
-            android:layout_height="@dimen/icon_size"
-            android:layout_width="@dimen/icon_size"
-            android:scaleType="centerInside"
-            android:src="@drawable/search"
-            app:iconGravity="textStart"
-            android:layout_marginEnd="@dimen/icon_margin"
-            app:iconTint="@color/text"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text"
-            android:textSize="@dimen/main_button_text_size"
-            android:textStyle="bold"
-            android:text="@string/search"/>
-    </LinearLayout>
-
-    <LinearLayout
+    <com.google.android.material.button.MaterialButton
+        style="@style/ButtonStyle"
         android:id="@+id/library_button"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:background="@drawable/rounded"
-        android:layout_marginBottom="@dimen/main_padding">
+        app:icon="@drawable/library"
+        android:text="@string/library"
+        />
 
-        <ImageView
-            android:layout_height="@dimen/icon_size"
-            android:layout_width="@dimen/icon_size"
-            android:scaleType="centerInside"
-            android:src="@drawable/library"
-            app:iconGravity="textStart"
-            android:layout_marginEnd="@dimen/icon_margin"
-            app:iconTint="@color/text"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text"
-            android:textSize="@dimen/main_button_text_size"
-            android:textStyle="bold"
-            android:text="@string/library"/>
-    </LinearLayout>
-
-    <LinearLayout
+    <com.google.android.material.button.MaterialButton
+        style="@style/ButtonStyle"
         android:id="@+id/settings_button"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:background="@drawable/rounded">
-
-        <ImageView
-            android:layout_height="@dimen/icon_size"
-            android:layout_width="@dimen/icon_size"
-            android:scaleType="centerInside"
-            android:src="@drawable/settings"
-            app:iconGravity="textStart"
-            android:layout_marginEnd="@dimen/icon_margin"
-            app:iconTint="@color/text"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text"
-            android:textSize="@dimen/main_button_text_size"
-            android:textStyle="bold"
-            android:text="@string/settings"/>
-
-    </LinearLayout>
+        app:icon="@drawable/settings"
+        android:text="@string/settings"
+        />
 </LinearLayout>
