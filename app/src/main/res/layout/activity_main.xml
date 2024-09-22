@@ -7,7 +7,8 @@
     android:paddingRight="@dimen/main_padding"
     android:paddingBottom="28dp"
     android:orientation="vertical"
-    android:background="@color/main_background">
+    android:background="@color/YP_Blue"
+    >
 
     <TextView
         style="@style/MainTitleStyle"
@@ -16,7 +17,7 @@
 
 
     <com.google.android.material.button.MaterialButton
-        style="@style/ButtonStyle"
+        style="@style/MainButtonStyle"
         android:id="@+id/search_button"
         app:icon="@drawable/search"
         android:text="@string/search"
@@ -24,14 +25,15 @@
 
 
     <com.google.android.material.button.MaterialButton
-        style="@style/ButtonStyle"
+        style="@style/MainButtonStyle"
         android:id="@+id/library_button"
         app:icon="@drawable/library"
+        app:iconSize="20dp"
         android:text="@string/library"
         />
 
     <com.google.android.material.button.MaterialButton
-        style="@style/ButtonStyle"
+        style="@style/MainButtonStyle"
         android:id="@+id/settings_button"
         app:icon="@drawable/settings"
         android:text="@string/settings"
