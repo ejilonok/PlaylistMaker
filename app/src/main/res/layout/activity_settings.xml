@@ -15,37 +15,32 @@
             android:text="@string/settings"/>
     </LinearLayout>
 
-    <LinearLayout
-        style="@style/SettingsItemLayout"
-        android:layout_marginTop="28dp">
-        <com.google.android.material.button.MaterialButton
-            style="@style/SettingsButton"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:text="@string/dark_theme"/>
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:layout_width="56dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="11dp"
-            android:gravity="center"
-            app:thumbTint="?attr/colorControlHighlight"
-            app:trackTint="?attr/colorControlNormal" />
-    </LinearLayout>
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/theme_switch"
+        style="@style/SettingsButton"
+        android:layout_height="61dp"
+        android:layout_marginTop="24dp"
+        android:layout_gravity="start|center"
+        android:text="@string/dark_theme"
+        app:thumbTint="?attr/colorControlHighlight"
+        app:trackTint="?attr/colorControlNormal" />
 
     <com.google.android.material.button.MaterialButton
         style="@style/SettingsButton"
+        android:id="@+id/share_app"
         android:text="@string/share_invitation"
         app:icon="@drawable/share"
         />
 
     <com.google.android.material.button.MaterialButton
         style="@style/SettingsButton"
+        android:id="@+id/support"
         android:text="@string/connect_to_support"
         app:icon="@drawable/support"
         />
     <com.google.android.material.button.MaterialButton
         style="@style/SettingsButton"
+        android:id="@+id/terms_of_use"
         android:text="@string/terms_of_use"
         app:icon="@drawable/arrow_forward"
         />

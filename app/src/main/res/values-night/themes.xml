@@ -14,5 +14,4 @@
         <item name="colorControlNormal">@color/YP_Blue_Light</item>
     </style>
 
-    <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker" />
 </resources>
