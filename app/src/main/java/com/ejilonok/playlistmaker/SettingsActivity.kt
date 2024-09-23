@@ -32,7 +32,7 @@ class SettingsActivity : AppCompatActivity() {
         val termsButton = findViewById<MaterialButton>(R.id.terms_of_use)
         termsButton.setOnClickListener() {
             val termsIntent = Intent(Intent.ACTION_VIEW)
-            termsIntent.data = Uri.parse("https:////yandex.ru/legal/practicum_offer/")
+            termsIntent.data = Uri.parse(getString(R.string.terms_link))
             startActivity(termsIntent)
         }
     }
