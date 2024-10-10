@@ -1,11 +1,12 @@
 package com.ejilonok.playlistmaker
 
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View.*
-import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 
@@ -19,7 +20,10 @@ class SearchActivity : AppCompatActivity() {
 
         clearButton.setOnClickListener() {
             searchLine.setText("")
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
+
+            val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+            searchLine.clearFocus()
         }
 
         val clearTextWatcher = object : TextWatcher {
