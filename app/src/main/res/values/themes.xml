@@ -11,6 +11,8 @@
         <item name="colorOnSecondaryContainer">@color/YP_Text_Gray</item>
         <item name="colorControlHighlight">@color/YP_Text_Gray</item>
         <item name="colorControlNormal">@color/YP_Light_Gray</item>
+        <item name="colorContainer">@color/YP_Light_Gray</item>
+        <item name="colorOnContainer">@color/YP_Text_Gray</item>
     </style>
 
     <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker">

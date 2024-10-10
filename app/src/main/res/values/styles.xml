@@ -57,12 +57,16 @@
         <item name="android:textFontWeight">500</item>
     </style>
     <style name="OtherSecondaryTitle">
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
         <item name="android:textSize">@dimen/setting_title_text_size</item>
-        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">500</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
-        <item name="android:gravity">center</item>
+        <item name="android:gravity">left</item>
     </style>
     <style name="SettingsTextView">
         <item name="android:layout_width">wrap_content</item>
@@ -118,5 +122,27 @@
         <item name="android:paddingTop">7.5dp</item>
         <item name="iconPadding">0dp</item>
         <item name="cornerRadius">0dp</item>
+    </style>
+    <style name="SearchEditText">
+        <item name="colorControlActivated">@android:color/transparent</item>
+        <item name="colorControlHighlight">@android:color/transparent</item>
+        <item name="colorControlNormal">@android:color/transparent</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="android:textCursorDrawable">@drawable/cursor</item>
+        <item name="android:textColor">@color/YP_Black_Total</item>
+        <item name="android:textColorHint">?attr/colorOnContainer</item>
+        <item name="android:gravity">center_vertical|left</item>
+        <item name="android:inputType">text</item>
+        <item name="android:textIsSelectable">false</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:lines">1</item>
+        <item name="android:maxLines">1</item>
+    </style>
+    <style name="SearchLineIcon">
+        <item name="android:layout_width">16dp</item>
+        <item name="android:layout_height">16dp</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="tint">?attr/colorOnContainer</item>
     </style>
 </resources>
