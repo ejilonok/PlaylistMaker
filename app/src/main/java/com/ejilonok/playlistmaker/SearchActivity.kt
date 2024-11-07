@@ -1,5 +1,6 @@
 package com.ejilonok.playlistmaker
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -26,6 +27,7 @@ class SearchActivity : AppCompatActivity() {
         outState.putString(SEARCH_STRING, searchString)
     }
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
@@ -55,25 +57,17 @@ class SearchActivity : AppCompatActivity() {
                     clearButton.visibility = GONE
                 } else
                     clearButton.visibility = VISIBLE
+
+                searchString = s?.toString() ?: ""
             }
 
             override fun afterTextChanged(s: Editable?) {
-                searchString = s?.toString() ?: ""
             }
         }
 
         searchLine.addTextChangedListener(clearTextWatcher)
 
-        val libraryButton = findViewById<MaterialButton>(R.id.search_library_button)
-        libraryButton.setOnClickListener {
-            val libraryIntent = Intent(this, LibraryActivity::class.java)
-            startActivity(libraryIntent)
-        }
-
-        val settingsButton = findViewById<MaterialButton>(R.id.search_settings_button)
-        settingsButton.setOnClickListener {
-            val settingsIntent = Intent(this, SettingsActivity::class.java)
-            startActivity(settingsIntent)
-        }
+        val backButton = findViewById<ImageView>(R.id.search_back_button)
+        backButton.setOnClickListener { this.finish() }
     }
 }
