@@ -138,6 +138,7 @@
         <item name="android:textFontWeight">400</item>
         <item name="android:lines">1</item>
         <item name="android:maxLines">1</item>
+        <item name="android:importantForAutofill">no</item>
     </style>
     <style name="SearchLineIcon">
         <item name="android:layout_width">16dp</item>

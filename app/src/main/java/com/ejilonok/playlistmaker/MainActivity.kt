@@ -10,6 +10,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        resumeTheme()
+
         val searchButton = findViewById<MaterialButton>(R.id.search_button)
         searchButton.setOnClickListener {
             val searchIntent = Intent(this, SearchActivity::class.java)
@@ -28,5 +30,9 @@ class MainActivity : AppCompatActivity() {
             startActivity(settingsIntent)
         }
 
+    }
+    private fun resumeTheme() {
+        val isDarkTheme = ThemeManager.getSavedThemeState(this)
+        ThemeManager.setDarkTheme(isDarkTheme)
     }
 }

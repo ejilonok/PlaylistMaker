@@ -59,10 +59,12 @@
         android:gravity="bottom">
         <com.google.android.material.button.MaterialButton
             style="@style/SettingsTabButton"
+            android:id="@+id/settings_search_button"
             android:text="@string/search"
             app:icon="@drawable/search"/>
         <com.google.android.material.button.MaterialButton
             style="@style/SettingsTabButton"
+            android:id="@+id/settings_library_button"
             android:text="@string/library"
             app:icon="@drawable/library"/>
         <com.google.android.material.button.MaterialButton

@@ -54,7 +54,7 @@
     </FrameLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_weight="1"/>
 
@@ -71,10 +71,12 @@
             android:textColor="@color/YP_Blue"/>
         <com.google.android.material.button.MaterialButton
             style="@style/SettingsTabButton"
+            android:id="@+id/search_library_button"
             android:text="@string/library"
             app:icon="@drawable/library"/>
         <com.google.android.material.button.MaterialButton
             style="@style/SettingsTabButton"
+            android:id="@+id/search_settings_button"
             android:text="@string/settings"
             app:icon="@drawable/settings"/>
     </LinearLayout>
