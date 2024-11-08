@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MainLayout">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+    <style name="SecondaryLayout">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">?attr/colorSecondary</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingStart">@dimen/main_padding</item>
+        <item name="android:paddingLeft">@dimen/main_padding</item>
+        <item name="android:paddingRight">@dimen/main_padding</item>
+        <item name="android:layout_gravity">top</item>
+    </style>
+    <style name="SecondaryLayoutTitle">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:layout_margin">@dimen/title_margin</item>
+    </style>
+    <style name="MainTitleStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/main_title_text_size</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:layout_marginTop">@dimen/title_margin</item>
+        <item name="android:layout_marginBottom">40dp</item>
+        <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">500</item>
+    </style>
+    <style name="MainButtonStyle" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginBottom">@dimen/main_padding</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="iconSize">@dimen/icon_size</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconTint">?attr/colorOnPrimaryContainer</item>
+        <item name="iconPadding">@dimen/icon_padding</item>
+        <item name="cornerRadius">@dimen/main_button_radius</item>
+        <item name="android:backgroundTint">?attr/colorPrimaryContainer</item>
+        <item name="android:textAppearance">?attr/textAppearanceHeadline1</item>
+        <item name="android:textColor">?attr/colorOnPrimaryContainer</item>
+        <item name="android:textSize">@dimen/main_button_text_size</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+    <style name="SettingsTitle">
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingLeft">@dimen/setting_title_padding</item>
+        <item name="android:paddingBottom">@dimen/setting_title_padding</item>
+        <item name="android:paddingRight">@dimen/setting_title_padding</item>
+        <item name="android:textSize">@dimen/setting_title_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">500</item>
+    </style>
+    <style name="OtherSecondaryTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:textSize">@dimen/setting_title_text_size</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:gravity">left</item>
+    </style>
+    <style name="SettingsTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingStart">@dimen/setting_padding_start</item>
+        <item name="android:paddingTop">@dimen/setting_padding_tb</item>
+        <item name="android:paddingBottom">@dimen/setting_padding_tb</item>
+        <item name="android:gravity">start</item>
+        <item name="android:textSize">@dimen/setting_item_text_size</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textFontWeight">400</item>
+    </style>
+    <style name="SettingsItemLayout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+    <style name="SettingsButton" parent="Widget.Material3.Button.IconButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">@dimen/main_padding</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="android:paddingLeft">@dimen/setting_padding_start</item>
+        <item name="android:paddingRight">@dimen/setting_icon_padding_end</item>
+        <item name="android:paddingTop">19dp</item>
+        <item name="android:paddingBottom">@dimen/setting_icon_padding_end</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="cornerRadius">0dp</item>
+        <item name="iconGravity">end</item>
+        <item name="iconTint">?attr/colorOnSecondaryContainer</item>
+        <item name="iconSize">@dimen/icon_size</item>
+        <item name="iconPadding">0dp</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:textSize">@dimen/setting_item_text_size</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textFontWeight">400</item>
+    </style>
+    <style name="SettingsTabButton" parent="Widget.Material3.Button.IconButton">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="iconGravity">top</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="iconSize">24dp</item>
+        <item name="iconTint">?attr/colorOnSecondary</item>
+        <item name="android:paddingTop">7.5dp</item>
+        <item name="iconPadding">0dp</item>
+        <item name="cornerRadius">0dp</item>
+    </style>
+    <style name="SearchEditText">
+        <item name="colorControlActivated">@android:color/transparent</item>
+        <item name="colorControlHighlight">@android:color/transparent</item>
+        <item name="colorControlNormal">@android:color/transparent</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="android:textCursorDrawable">@drawable/cursor</item>
+        <item name="android:textColor">@color/YP_Black_Total</item>
+        <item name="android:textColorHint">?attr/colorOnContainer</item>
+        <item name="android:gravity">center_vertical|left</item>
+        <item name="android:inputType">text</item>
+        <item name="android:textIsSelectable">false</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:lines">1</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:importantForAutofill">no</item>
+    </style>
+    <style name="SearchLineIcon">
+        <item name="android:layout_width">16dp</item>
+        <item name="android:layout_height">16dp</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="tint">?attr/colorOnContainer</item>
+    </style>
+</resources>
