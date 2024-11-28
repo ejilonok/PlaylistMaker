@@ -8,6 +8,12 @@
         android:layout_height="wrap_content"
         style="@style/SecondaryLayoutTitle">
 
+        <ImageView
+            android:id="@+id/settings_back_button"
+            style="@style/BackIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -44,35 +50,5 @@
         android:text="@string/terms_of_use"
         app:icon="@drawable/arrow_forward"
         />
-
-    <LinearLayout
-        android:id="@+id/empty_space"
-        android:layout_height="0dp"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical" />
-
-    <LinearLayout
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:orientation="horizontal"
-        android:gravity="bottom">
-        <com.google.android.material.button.MaterialButton
-            style="@style/SettingsTabButton"
-            android:id="@+id/settings_search_button"
-            android:text="@string/search"
-            app:icon="@drawable/search"/>
-        <com.google.android.material.button.MaterialButton
-            style="@style/SettingsTabButton"
-            android:id="@+id/settings_library_button"
-            android:text="@string/library"
-            app:icon="@drawable/library"/>
-        <com.google.android.material.button.MaterialButton
-            style="@style/SettingsTabButton"
-            android:text="@string/settings"
-            app:icon="@drawable/settings"
-            app:iconTint="@color/YP_Blue"
-            android:textColor="@color/YP_Blue"/>
-    </LinearLayout>
 
 </LinearLayout>
