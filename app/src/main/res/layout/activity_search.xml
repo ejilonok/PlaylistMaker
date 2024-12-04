@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/SecondaryLayout">
+    style="@style/SecondaryLayout"
+    android:paddingStart="@dimen/zero"
+    android:paddingLeft="@dimen/zero"
+    android:paddingRight="@dimen/zero">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/SecondaryLayout">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -9,13 +17,11 @@
         style="@style/SecondaryLayoutTitle">
 
         <ImageView
+            android:id="@+id/search_back_button"
+            style="@style/BackIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/arrow_back"
-            android:id="@+id/search_back_button"
-            android:layout_gravity="center"
-            android:paddingRight="12dp"
-            app:tint="?attr/colorOnSecondary" />
+            />
 
         <TextView
             style="@style/OtherSecondaryTitle"
@@ -24,15 +30,8 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:paddingTop="8dp"
-        android:paddingStart="12dp"
-        android:paddingBottom="8dp"
-        android:paddingEnd="10dp"
-        android:background="@drawable/search_edit"
-        android:backgroundTint="@color/YP_Light_Gray">
+        android:layout_height="36dp"
+        style="@style/SearchLineFrame">
 
         <ImageView
             style="@style/SearchLineIcon"
@@ -64,4 +63,14 @@
             />
 
     </FrameLayout>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/track_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="@dimen/main_padding"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        />
 </LinearLayout>

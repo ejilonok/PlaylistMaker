@@ -154,4 +154,20 @@
         <item name="android:scaleType">centerInside</item>
         <item name="tint">?attr/colorOnContainer</item>
     </style>
+    <style name="BackIcon">
+        <item name="android:src">@drawable/arrow_back</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="tint">?attr/colorOnSecondary</item>
+    </style>
+    <style name="SearchLineFrame">
+        <item name="android:layout_marginTop">8dp</item>>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:paddingTop">9dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:background">@drawable/search_edit</item>
+        <item name="android:backgroundTint">@color/YP_Light_Gray</item>
+    </style>
 </resources>

@@ -2,7 +2,6 @@ package com.ejilonok.playlistmaker
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -12,7 +11,7 @@ import android.view.View.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
-import com.google.android.material.button.MaterialButton
+import androidx.recyclerview.widget.RecyclerView
 
 class SearchActivity : AppCompatActivity() {
     private var searchString : String? = SEARCH_STRING_DEF
@@ -27,19 +26,23 @@ class SearchActivity : AppCompatActivity() {
         outState.putString(SEARCH_STRING, searchString)
     }
 
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        searchString = savedInstanceState.getString(SEARCH_STRING) ?: SEARCH_STRING_DEF
+    }
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        if (savedInstanceState != null) {
-            searchString = savedInstanceState.getString(SEARCH_STRING)
-        }
+        searchString = savedInstanceState?.getString(SEARCH_STRING) ?: SEARCH_STRING_DEF
 
         val searchLine = findViewById<EditText>(R.id.search_line)
         val clearButton = findViewById<ImageView>(R.id.clear_button)
 
         searchLine.setText(searchString)
-        clearButton.setOnClickListener() {
+        clearButton.setOnClickListener {
             searchLine.setText("")
 
             val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -69,5 +72,9 @@ class SearchActivity : AppCompatActivity() {
 
         val backButton = findViewById<ImageView>(R.id.search_back_button)
         backButton.setOnClickListener { this.finish() }
+
+        val recyclerView = findViewById<RecyclerView>(R.id.track_list)
+        val trackAdapter = TrackAdapter(TrackMock.createMock())
+        recyclerView.adapter = trackAdapter
     }
 }

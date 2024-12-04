@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.accessors.runtime.addDependencyTo
+
 pluginManagement {
     repositories {
         google()
@@ -12,6 +14,7 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+
 
 rootProject.name = "Playlist Maker"
 include(":app")
