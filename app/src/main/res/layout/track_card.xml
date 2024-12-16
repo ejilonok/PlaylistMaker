@@ -44,7 +44,7 @@
             <TextView
                 android:id="@+id/artist_name"
                 style="@style/ArtistName"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 tools:text="Artist Name" />
@@ -55,7 +55,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/track_point"
-                android:scrollHorizontally="false"
                 android:ellipsize="none"
                 tools:text="0:51" />
         </LinearLayout>
