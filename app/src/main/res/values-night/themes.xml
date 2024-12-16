@@ -14,6 +14,7 @@
         <item name="colorContainer">@color/YP_White</item>
         <item name="colorOnContainer">@color/YP_Black</item>
         <item name="colorOnSurfaceVariant">@color/YP_Blue</item>
+        <item name="colorOnErrorContainer">@color/YP_White</item>
     </style>
 
     <style name="TrackName">
@@ -30,6 +31,7 @@
         <item name="android:textColor">@color/YP_White</item>
         <item name="android:drawableTint">@color/YP_White</item>
         <item name="android:textSize">11sp</item>
+        <item name="android:scrollHorizontally">false</item>
     </style>
 
     <style name="TrackForwardIcon">

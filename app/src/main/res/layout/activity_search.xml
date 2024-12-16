@@ -43,13 +43,12 @@
             android:id="@+id/search_line"
             style="@style/SearchEditText"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="36dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="24dp"
             android:hint="@string/search"
-            android:textSize="16sp"
-            android:paddingBottom="0dp"
-            android:paddingTop="0dp"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
             />
 
 
@@ -64,6 +63,31 @@
 
     </FrameLayout>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/search_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TrackErrorStyle"
+        android:drawableTop="@drawable/empty_track_list"
+        android:text="@string/no_tracks"
+         />
+    <TextView
+        android:id="@+id/server_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TrackErrorStyle"
+        android:drawableTop="@drawable/server_error"
+        android:text="@string/server_error"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/update_button"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        style="@style/UpdateButton"
+        android:text="@string/update"
+        android:visibility="gone"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/track_list"
