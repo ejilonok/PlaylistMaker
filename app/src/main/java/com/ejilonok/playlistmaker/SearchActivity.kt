@@ -10,23 +10,17 @@ import android.text.TextWatcher
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
+import com.ejilonok.playlistmaker.databinding.ActivitySearchBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
     private var searchString : String? = SEARCH_STRING_DEF
-    private lateinit var searchErrorView : TextView
-    private lateinit var serverErrorView : TextView
-    private lateinit var recyclerView : RecyclerView
-    private lateinit var updateButton : MaterialButton
+    private var binding : ActivitySearchBinding? = null
 
     companion object {
         const val SEARCH_STRING = "SEARCH_STRING"
@@ -44,115 +38,127 @@ class SearchActivity : AppCompatActivity() {
         searchString = savedInstanceState.getString(SEARCH_STRING) ?: SEARCH_STRING_DEF
     }
 
-
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
-        searchString = savedInstanceState?.getString(SEARCH_STRING) ?: SEARCH_STRING_DEF
+        binding = ActivitySearchBinding.inflate(layoutInflater)
+        binding?.let {
+            setContentView(it.root)
 
-        val searchLine = findViewById<EditText>(R.id.search_line)
-        val clearButton = findViewById<ImageView>(R.id.clear_button)
+            searchString = savedInstanceState?.getString(SEARCH_STRING) ?: SEARCH_STRING_DEF
 
-        searchLine.setText(searchString)
+            val searchLine = it.searchLine
+            searchLine.setText(searchString)
 
-        searchErrorView = findViewById(R.id.search_error)
-        serverErrorView = findViewById(R.id.server_error)
-        updateButton = findViewById(R.id.update_button)
+            val trackAdapter = TrackAdapter()
+            val tracks = trackAdapter.tracks
+            it.recyclerTrackList.adapter = trackAdapter
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://itunes.apple.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val trackApiService = retrofit.create(TrackApiService::class.java)
-        recyclerView = findViewById<RecyclerView>(R.id.track_list)
-        val trackAdapter = TrackAdapter()
-        val tracks = trackAdapter.tracks
-        recyclerView.adapter = trackAdapter
+            it.clearButton.setOnClickListener {
+                searchLine.setText("")
 
-        clearButton.setOnClickListener {
-            searchLine.setText("")
+                // Скрытие клавиатуры
+                val inputMethodManager =
+                    getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+                searchLine.clearFocus()
 
-            val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
-            searchLine.clearFocus()
-
-            hideResults()
-        }
-
-        updateButton.setOnClickListener {
-            searchLine.onEditorAction(EditorInfo.IME_ACTION_DONE)
-        }
-
-        val clearTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                // empty
+                hideResults()
             }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.isNullOrEmpty()) {
-                    clearButton.visibility = GONE
-                } else
-                    clearButton.visibility = VISIBLE
-
-                searchString = s?.toString() ?: ""
+            it.updateButton.setOnClickListener {
+                searchLine.onEditorAction(EditorInfo.IME_ACTION_DONE)
             }
 
-            override fun afterTextChanged(s: Editable?) {
+            val clearTextWatcher = object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                    // empty
+                }
 
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    if (s.isNullOrEmpty()) {
+                        it.clearButton.visibility = GONE
+                    } else
+                        it.clearButton.visibility = VISIBLE
+
+                    searchString = s?.toString() ?: ""
+                }
+
+                override fun afterTextChanged(s: Editable?) {
+
+                }
             }
-        }
 
-        searchLine.addTextChangedListener(clearTextWatcher)
+            searchLine.addTextChangedListener(clearTextWatcher)
 
-        val backButton = findViewById<ImageView>(R.id.search_back_button)
-        backButton.setOnClickListener { this.finish() }
+            it.searchBackButton.setOnClickListener { this.finish() }
 
+            val trackApiService = (application as PlaylistMakerApplication).getTrackApiService()
 
-        searchLine.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                trackApiService.getTracks( searchLine.text.toString() ).enqueue(object : Callback<TracksResponse> {
-                    override fun onResponse(call : Call<TracksResponse>, response : Response<TracksResponse>) {
-                        if (response.isSuccessful) {
-                            tracks.clear()
-                            if (response.body()?.results?.isNotEmpty() ?: false) {
-                                tracks.addAll(response.body()?.results!!)
-                                showResult(recyclerView)
-                                trackAdapter.notifyDataSetChanged()
-                                recyclerView.scrollToPosition(0)
-                            } else {
-                                showResult(searchErrorView)
-                            }
-                        } else {
-                            showResult(serverErrorView)
-                        }
+            if (trackApiService == null) {
+                Toast.makeText(this, "Ошибка открытия сервиса. Попробуйте перезапустить приложение", Toast.LENGTH_LONG)
+            } else {
+                searchLine.setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        trackApiService!!.getTracks(searchLine.text.toString())
+                            .enqueue(object : Callback<TracksResponse> {
+                                override fun onResponse(
+                                    call: Call<TracksResponse>,
+                                    response: Response<TracksResponse>
+                                ) {
+                                    if (response.isSuccessful) {
+                                        tracks.clear()
+                                        if (response.body()?.results?.isNotEmpty() ?: false) {
+                                            tracks.addAll(response.body()?.results!!)
+                                            showResult(it.recyclerTrackList)
+                                            trackAdapter.notifyDataSetChanged()
+                                            it.recyclerTrackList.scrollToPosition(0)
+                                        } else {
+                                            showResult(it.searchError)
+                                        }
+                                    } else {
+                                        showResult(it.serverError)
+                                    }
+                                }
+
+                                override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
+                                    showResult(it.serverError)
+                                }
+                            })
+                        true
                     }
-
-                    override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
-                        showResult(serverErrorView)
-                    }
-                })
-                true
+                    false
+                }
             }
-            false
         }
     }
 
     fun showResult(recyclerView: RecyclerView) {
-        hideResults()
-        recyclerView.visibility = VISIBLE
+        binding?.let {
+            hideResults()
+            recyclerView.visibility = VISIBLE
+        }
     }
 
     fun showResult(textView : TextView) {
-        hideResults()
-        textView.visibility = VISIBLE
-        if (textView === serverErrorView) updateButton.visibility = VISIBLE
+        binding?.let {
+            hideResults()
+            textView.visibility = VISIBLE
+            if (textView === it.serverError) it.updateButton.visibility = VISIBLE
+        }
     }
 
     fun hideResults() {
-        searchErrorView.visibility = GONE
-        serverErrorView.visibility = GONE
-        recyclerView.visibility = GONE
-        updateButton.visibility = GONE
+        binding?.let {
+            it.searchError.visibility = GONE
+            it.serverError.visibility = GONE
+            it.recyclerTrackList.visibility = GONE
+            it.updateButton.visibility = GONE
+        }
     }
 }

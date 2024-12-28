@@ -34,7 +34,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginBottom="1dp"
             android:maxWidth="100dp"
-            tools:text="Track Name ----------------------------------------------------------------------------------------------" />
+            tools:text="[Track Name ----------------------------------------------------------------------------------------------]" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                tools:text="Artist Name" />
+                tools:text="[Artist Name]" />
 
             <TextView
                 android:id="@+id/track_time"
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/track_point"
                 android:ellipsize="none"
-                tools:text="0:51" />
+                tools:text="[0:51]" />
         </LinearLayout>
     </LinearLayout>
 

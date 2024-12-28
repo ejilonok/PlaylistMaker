@@ -7,6 +7,10 @@ android {
     namespace = "com.ejilonok.playlistmaker"
     compileSdk = 34
 
+    viewBinding {
+        enable = true
+    }
+
     defaultConfig {
         applicationId = "com.ejilonok.playlistmaker"
         minSdk = 29
