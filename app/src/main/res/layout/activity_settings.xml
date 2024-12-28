@@ -33,20 +33,20 @@
 
     <com.google.android.material.button.MaterialButton
         style="@style/SettingsButton"
-        android:id="@+id/share_app"
+        android:id="@+id/share_button"
         android:text="@string/share_invitation"
         app:icon="@drawable/share"
         />
 
     <com.google.android.material.button.MaterialButton
         style="@style/SettingsButton"
-        android:id="@+id/support"
+        android:id="@+id/support_button"
         android:text="@string/connect_to_support"
         app:icon="@drawable/support"
         />
     <com.google.android.material.button.MaterialButton
         style="@style/SettingsButton"
-        android:id="@+id/terms_of_use"
+        android:id="@+id/terms_of_use_button"
         android:text="@string/terms_of_use"
         app:icon="@drawable/arrow_forward"
         />

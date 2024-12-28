@@ -13,6 +13,7 @@
         <item name="colorControlNormal">@color/YP_Light_Gray</item>
         <item name="colorContainer">@color/YP_Light_Gray</item>
         <item name="colorOnContainer">@color/YP_Text_Gray</item>
+        <item name="colorOnErrorContainer">@color/YP_Black</item>
     </style>
 
     <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker">
@@ -33,9 +34,11 @@
         <item name="android:textColor">@color/YP_Text_Gray</item>
         <item name="android:drawableTint">@color/YP_Text_Gray</item>
         <item name="android:textSize">11sp</item>
+        <item name="android:scrollHorizontally">false</item>
     </style>
 
     <style name="TrackForwardIcon">
         <item name="backgroundTint">@color/YP_Text_Gray</item>
     </style>
+
 </resources>
