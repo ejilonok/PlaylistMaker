@@ -1,8 +1,6 @@
 package com.ejilonok.playlistmaker
 
 import android.util.TypedValue
-import android.view.View
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -10,7 +8,7 @@ import com.ejilonok.playlistmaker.databinding.TrackCardBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class TrackViewHolder(var binding: TrackCardBinding) : RecyclerView.ViewHolder(binding.root) {
+class TrackViewHolder(private var binding: TrackCardBinding) : RecyclerView.ViewHolder(binding.root) {
     private fun dpToPx(dp: Float): Int {
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,

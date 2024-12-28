@@ -101,11 +101,11 @@ class SearchActivity : AppCompatActivity() {
             val trackApiService = (application as PlaylistMakerApplication).getTrackApiService()
 
             if (trackApiService == null) {
-                Toast.makeText(this, "Ошибка открытия сервиса. Попробуйте перезапустить приложение", Toast.LENGTH_LONG)
+                Toast.makeText(this, getString(R.string.api_exception), Toast.LENGTH_LONG)
             } else {
                 searchLine.setOnEditorActionListener { _, actionId, _ ->
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        trackApiService!!.getTracks(searchLine.text.toString())
+                        trackApiService.getTracks(searchLine.text.toString())
                             .enqueue(object : Callback<TracksResponse> {
                                 override fun onResponse(
                                     call: Call<TracksResponse>,
@@ -138,14 +138,14 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    fun showResult(recyclerView: RecyclerView) {
+    private fun showResult(recyclerView: RecyclerView) {
         binding?.let {
             hideResults()
             recyclerView.visibility = VISIBLE
         }
     }
 
-    fun showResult(textView : TextView) {
+    private fun showResult(textView : TextView) {
         binding?.let {
             hideResults()
             textView.visibility = VISIBLE
@@ -153,7 +153,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    fun hideResults() {
+    private fun hideResults() {
         binding?.let {
             it.searchError.visibility = GONE
             it.serverError.visibility = GONE

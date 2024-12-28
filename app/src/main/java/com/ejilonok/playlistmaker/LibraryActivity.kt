@@ -1,9 +1,7 @@
 package com.ejilonok.playlistmaker
 
-import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
 import com.ejilonok.playlistmaker.databinding.ActivityLibraryBinding
 
 class LibraryActivity : AppCompatActivity() {

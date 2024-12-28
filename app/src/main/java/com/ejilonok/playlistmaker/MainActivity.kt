@@ -1,10 +1,9 @@
 package com.ejilonok.playlistmaker
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.ejilonok.playlistmaker.databinding.ActivityMainBinding
-import com.google.android.material.button.MaterialButton
 
 class MainActivity : AppCompatActivity() {
     private var binding : ActivityMainBinding? = null
