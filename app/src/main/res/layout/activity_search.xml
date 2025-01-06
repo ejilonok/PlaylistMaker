@@ -11,57 +11,57 @@
         android:layout_height="wrap_content"
         style="@style/SecondaryLayout">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/SecondaryLayoutTitle">
-
-        <ImageView
-            android:id="@+id/search_back_button"
-            style="@style/BackIcon"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            />
+            style="@style/SecondaryLayoutTitle">
 
-        <TextView
-            style="@style/OtherSecondaryTitle"
-            android:text="@string/search" />
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/search_back_button"
+                style="@style/BackIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        style="@style/SearchLineFrame">
+            <TextView
+                style="@style/OtherSecondaryTitle"
+                android:text="@string/search" />
+        </LinearLayout>
 
-        <ImageView
-            style="@style/SearchLineIcon"
-            android:src="@drawable/search"
-            android:layout_gravity="start|center_vertical"
-            android:contentDescription="@string/search"/>
-
-        <EditText
-            android:id="@+id/search_line"
-            style="@style/SearchEditText"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="36dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="24dp"
-            android:hint="@string/search"
-            android:imeOptions="actionDone"
-            android:singleLine="true"
-            />
+            style="@style/SearchLineFrame">
+
+            <ImageView
+                style="@style/SearchLineIcon"
+                android:src="@drawable/search"
+                android:layout_gravity="start|center_vertical"
+                android:contentDescription="@string/search"/>
+
+            <EditText
+                android:id="@+id/search_line"
+                style="@style/SearchEditText"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="24dp"
+                android:hint="@string/search"
+                android:imeOptions="actionDone"
+                android:singleLine="true"
+                />
 
 
-        <ImageView
-            android:id="@+id/clear_button"
-            style="@style/SearchLineIcon"
-            android:src="@drawable/clear"
-            android:layout_gravity="end|center_vertical"
-            android:contentDescription="@string/clear"
-            android:visibility="gone"
-            />
+            <ImageView
+                android:id="@+id/clear_button"
+                style="@style/SearchLineIcon"
+                android:src="@drawable/clear"
+                android:layout_gravity="end|center_vertical"
+                android:contentDescription="@string/clear"
+                android:visibility="gone"
+                />
 
-    </FrameLayout>
+        </FrameLayout>
     </LinearLayout>
 
     <TextView
@@ -88,6 +88,37 @@
         style="@style/UpdateButton"
         android:text="@string/update"
         android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/history_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            style="@style/HistoryTitleStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/history_title"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_history_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbars="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/clear_history_button"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            style="@style/UpdateButton"
+            android:layout_marginTop="24dp"
+            android:text="@string/history_clear"/>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_track_list"

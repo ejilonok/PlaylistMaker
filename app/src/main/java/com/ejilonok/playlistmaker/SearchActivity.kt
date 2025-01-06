@@ -21,6 +21,7 @@ import retrofit2.Response
 class SearchActivity : AppCompatActivity() {
     private var searchString : String? = SEARCH_STRING_DEF
     private var binding : ActivitySearchBinding? = null
+    private var searchHistory : SearchHistory? = null
 
     companion object {
         const val SEARCH_STRING = "SEARCH_STRING"
@@ -50,24 +51,32 @@ class SearchActivity : AppCompatActivity() {
             val searchLine = it.searchLine
             searchLine.setText(searchString)
 
-            val trackAdapter = TrackAdapter()
-            val tracks = trackAdapter.tracks
-            it.recyclerTrackList.adapter = trackAdapter
+            val searchTrackAdapter = TrackAdapter(::addTrack)
+            it.recyclerTrackList.adapter = searchTrackAdapter
+
+            val showTrackPressed = { track : Track ->
+                Toast.makeText(this, track.toString(), Toast.LENGTH_LONG).show()
+            }
+            val historyTrackAdapter = TrackAdapter(showTrackPressed)
+            it.recyclerHistoryList.adapter = historyTrackAdapter
+            searchHistory = SearchHistory(getSharedPreferences(SearchHistory.SHARED_PREFERENCE_HISTORY, MODE_PRIVATE), historyTrackAdapter.tracks)
 
             it.clearButton.setOnClickListener {
                 searchLine.setText("")
 
-                // Скрытие клавиатуры
-                val inputMethodManager =
-                    getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+                hideKeyboard()
                 searchLine.clearFocus()
 
-                hideResults()
+                hideSearchResults()
+                showHistory()
             }
 
             it.updateButton.setOnClickListener {
                 searchLine.onEditorAction(EditorInfo.IME_ACTION_DONE)
+            }
+
+            it.clearHistoryButton.setOnClickListener {
+                clearHistory()
             }
 
             val clearTextWatcher = object : TextWatcher {
@@ -83,8 +92,11 @@ class SearchActivity : AppCompatActivity() {
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     if (s.isNullOrEmpty()) {
                         it.clearButton.visibility = GONE
-                    } else
+                        showHistory()
+                    } else {
                         it.clearButton.visibility = VISIBLE
+                        hideHistory()
+                    }
 
                     searchString = s?.toString() ?: ""
                 }
@@ -95,16 +107,23 @@ class SearchActivity : AppCompatActivity() {
             }
 
             searchLine.addTextChangedListener(clearTextWatcher)
+            searchLine.setOnFocusChangeListener { _ , hasFocus ->
+                if (hasFocus && searchLine.text.isNullOrEmpty()) showHistory() else hideHistory()
+            }
+            searchLine.requestFocus()
+
 
             it.searchBackButton.setOnClickListener { this.finish() }
 
             val trackApiService = (application as PlaylistMakerApplication).getTrackApiService()
 
             if (trackApiService == null) {
-                Toast.makeText(this, getString(R.string.api_exception), Toast.LENGTH_LONG)
+                Toast.makeText(this, getString(R.string.api_exception), Toast.LENGTH_LONG).show()
             } else {
                 searchLine.setOnEditorActionListener { _, actionId, _ ->
-                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    /* обработку события unspecified сделала для упрощения отладки - при нажатии клавиши enter
+                     на реальной клавиатуре именно этот тип IME события вызывается */
+                    if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
                         trackApiService.getTracks(searchLine.text.toString())
                             .enqueue(object : Callback<TracksResponse> {
                                 override fun onResponse(
@@ -112,53 +131,96 @@ class SearchActivity : AppCompatActivity() {
                                     response: Response<TracksResponse>
                                 ) {
                                     if (response.isSuccessful) {
-                                        tracks.clear()
+                                        searchTrackAdapter.tracks.clear()
                                         if (response.body()?.results?.isNotEmpty() ?: false) {
-                                            tracks.addAll(response.body()?.results!!)
-                                            showResult(it.recyclerTrackList)
-                                            trackAdapter.notifyDataSetChanged()
-                                            it.recyclerTrackList.scrollToPosition(0)
+                                            searchTrackAdapter.tracks.addAll(response.body()?.results!!)
+                                            showSearchResult(it.recyclerTrackList)
                                         } else {
-                                            showResult(it.searchError)
+                                            showSearchResult(it.searchError)
                                         }
                                     } else {
-                                        showResult(it.serverError)
+                                        showSearchResult(it.serverError)
                                     }
                                 }
 
                                 override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
-                                    showResult(it.serverError)
+                                    showSearchResult(it.serverError)
                                 }
                             })
                         true
-                    }
-                    false
+                    } else false
                 }
             }
+
+            showHistory()
         }
     }
 
-    private fun showResult(recyclerView: RecyclerView) {
+    @SuppressLint("NotifyDataSetChanged")
+    private fun showSearchResult(recyclerView: RecyclerView) {
         binding?.let {
-            hideResults()
+            hideSearchResults()
             recyclerView.visibility = VISIBLE
+            recyclerView.scrollToPosition(0)
+            it.recyclerTrackList.adapter?.notifyDataSetChanged()
         }
     }
 
-    private fun showResult(textView : TextView) {
+    private fun showSearchResult(textView : TextView) {
         binding?.let {
-            hideResults()
+            hideSearchResults()
             textView.visibility = VISIBLE
             if (textView === it.serverError) it.updateButton.visibility = VISIBLE
         }
     }
 
-    private fun hideResults() {
+    private fun hideSearchResults() {
         binding?.let {
             it.searchError.visibility = GONE
             it.serverError.visibility = GONE
             it.recyclerTrackList.visibility = GONE
             it.updateButton.visibility = GONE
+
+            hideKeyboard()
+        }
+    }
+
+    private fun loadHistory() {
+        searchHistory?.load()
+        binding?.recyclerHistoryList?.adapter?.notifyDataSetChanged()
+    }
+
+    private fun showHistory() {
+        searchHistory?.let {
+            loadHistory()
+            binding?.historyGroup?.visibility = if (it.tracks.isNotEmpty()) VISIBLE else GONE
+        }
+    }
+
+    private fun hideHistory() {
+        binding?.historyGroup?.visibility = GONE
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun addTrack(track : Track) {
+        searchHistory?.let {
+            it.addTrack(track)
+            binding?.recyclerHistoryList?.adapter?.notifyDataSetChanged()
+        }
+    }
+
+    private fun hideKeyboard() {
+        val inputMethodManager =
+            getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun clearHistory() {
+        searchHistory?.let {
+            it.clearHistory()
+            hideHistory()
+            binding?.recyclerHistoryList?.adapter?.notifyDataSetChanged()
         }
     }
 }
