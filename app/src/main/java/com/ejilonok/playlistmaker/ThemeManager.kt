@@ -2,6 +2,7 @@ package com.ejilonok.playlistmaker
 
 import android.app.Activity
 import android.content.Context
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
 
 class ThemeManager {
@@ -23,7 +24,8 @@ class ThemeManager {
 
         fun getSavedThemeState(activity: Activity) : Boolean {
             val sharedPreferences = activity.getSharedPreferences("com.ejilonok.playlistmaker.ThemeSettings", Context.MODE_PRIVATE)
-            val systemTheme = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
+            val nightMode = activity.applicationContext.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            val systemTheme = nightMode == Configuration.UI_MODE_NIGHT_YES
             return sharedPreferences.getBoolean("isDarkTheme", systemTheme)
         }
 

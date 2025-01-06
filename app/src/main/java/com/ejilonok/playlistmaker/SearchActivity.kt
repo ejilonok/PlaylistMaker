@@ -92,10 +92,10 @@ class SearchActivity : AppCompatActivity() {
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     if (s.isNullOrEmpty()) {
                         it.clearButton.visibility = GONE
+                        hideSearchResults()
                         showHistory()
                     } else {
                         it.clearButton.visibility = VISIBLE
-                        hideHistory()
                     }
 
                     searchString = s?.toString() ?: ""
@@ -159,6 +159,8 @@ class SearchActivity : AppCompatActivity() {
     @SuppressLint("NotifyDataSetChanged")
     private fun showSearchResult(recyclerView: RecyclerView) {
         binding?.let {
+            hideHistory()
+            hideKeyboard()
             hideSearchResults()
             recyclerView.visibility = VISIBLE
             recyclerView.scrollToPosition(0)
@@ -168,6 +170,8 @@ class SearchActivity : AppCompatActivity() {
 
     private fun showSearchResult(textView : TextView) {
         binding?.let {
+            hideHistory()
+            hideKeyboard()
             hideSearchResults()
             textView.visibility = VISIBLE
             if (textView === it.serverError) it.updateButton.visibility = VISIBLE
@@ -180,11 +184,10 @@ class SearchActivity : AppCompatActivity() {
             it.serverError.visibility = GONE
             it.recyclerTrackList.visibility = GONE
             it.updateButton.visibility = GONE
-
-            hideKeyboard()
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun loadHistory() {
         searchHistory?.load()
         binding?.recyclerHistoryList?.adapter?.notifyDataSetChanged()
