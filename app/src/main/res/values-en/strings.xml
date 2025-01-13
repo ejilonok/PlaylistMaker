@@ -16,4 +16,9 @@
     <string name="api_exception">API connection exception. Try to restart application</string>
     <string name="history_title">You\'re looking for</string>
     <string name="history_clear">Clear history</string>
+    <string name="track_time">Track time</string>
+    <string name="collection_name">Collection</string>
+    <string name="genre">Genre</string>
+    <string name="country">Country</string>
+    <string name="year">Year</string>
 </resources>

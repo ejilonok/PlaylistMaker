@@ -7,6 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class PlaylistMakerApplication : Application() {
     private var trackApiService : TrackApiService? = null
+    var actualTrack : Track? = null
     override fun onCreate() {
         super.onCreate()
 
