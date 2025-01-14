@@ -10,12 +10,12 @@ class Track (
     // оптимизация не кажется мне необходимой
     val trackName: String, // Название композиции
     val artistName: String, // Имя исполнителя
-    val trackTimeMillis: Long, // Продолжительность трека
-    val artworkUrl100: String, // Ссылка на изображение обложки
-    val collectionName: String, // Название альбома
-    val releaseDate: String, // Год релиза трека
-    val primaryGenreName: String, // Жанр трека
-    val country : String // Страна исполнителя
+    private val trackTimeMillis: Long, // Продолжительность трека
+    val artworkUrl100: String?, // Ссылка на изображение обложки
+    val collectionName: String?, // Название альбома
+    val releaseDate: String?, // Год релиза трека
+    val primaryGenreName: String?, // Жанр трека
+    val country : String? // Страна исполнителя
 )
 {
     override fun equals(other: Any?): Boolean {
@@ -32,7 +32,7 @@ class Track (
     }
 
     override fun toString(): String {
-        return "$trackId: $artistName - $trackName (${getTrackTimeString()}) from [$collectionName], RD:[$releaseDate], primaryGenre=${primaryGenreName}, country=$country"
+        return "$trackId: $artistName - $trackName (${getTrackTimeString()}) from [${collectionName ?: null}], RD:[$releaseDate], primaryGenre=${primaryGenreName}, country=$country"
     }
 
     fun getTrackTimeString() : String {

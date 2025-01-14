@@ -122,7 +122,7 @@ class SearchActivity : AppCompatActivity() {
                     /* обработку события unspecified сделала для упрощения отладки - при нажатии клавиши enter
                      на реальной клавиатуре именно этот тип IME события вызывается */
                     if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
-                        trackApiService.getTracks(searchLine.text.toString())
+                        trackApiService.getTracks(searchLine.text.toString().replace(" ","+"))
                             .enqueue(object : Callback<TracksResponse> {
                                 override fun onResponse(
                                     call: Call<TracksResponse>,
@@ -130,7 +130,7 @@ class SearchActivity : AppCompatActivity() {
                                 ) {
                                     if (response.isSuccessful) {
                                         searchTrackAdapter.tracks.clear()
-                                        if (response.body()?.results?.isNotEmpty() ?: false) {
+                                        if (response.body()?.results?.isNotEmpty() == true) {
                                             searchTrackAdapter.tracks.addAll(response.body()?.results!!)
                                             showSearchResult(it.recyclerTrackList)
                                         } else {

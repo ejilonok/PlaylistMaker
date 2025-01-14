@@ -15,7 +15,7 @@ class TrackViewHolder(private var binding: TrackCardBinding) : RecyclerView.View
                 model.getTrackTimeString()
 
             Glide.with(itemView)
-                .load(model.artworkUrl100)
+                .load(if (model.artworkUrl100.isNullOrEmpty()) "" else model.artworkUrl100)
                 .placeholder(R.drawable.cover_placeholder)
                 .centerCrop()
                 .transform(RoundedCorners(GraphicUtils.dpToPx(2.0f, it.root)))
