@@ -23,4 +23,9 @@
     <string name="api_exception">Ошибка открытия сервиса. Попробуйте перезапустить приложение</string>
     <string name="history_title">Вы искали</string>
     <string name="history_clear">Очистить историю</string>
+    <string name="track_time">Длительность</string>
+    <string name="collection_name">Альбом</string>
+    <string name="year">Год</string>
+    <string name="genre">Жанр</string>
+    <string name="country">Страна</string>
 </resources>

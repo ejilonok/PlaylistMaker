@@ -2,6 +2,7 @@ package com.ejilonok.playlistmaker
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -51,13 +52,10 @@ class SearchActivity : AppCompatActivity() {
             val searchLine = it.searchLine
             searchLine.setText(searchString)
 
-            val searchTrackAdapter = TrackAdapter(::addTrack)
+            val searchTrackAdapter = TrackAdapter(::addTrackAndStartPlayer)
             it.recyclerTrackList.adapter = searchTrackAdapter
 
-            val showTrackPressed = { track : Track ->
-                Toast.makeText(this, track.toString(), Toast.LENGTH_LONG).show()
-            }
-            val historyTrackAdapter = TrackAdapter(showTrackPressed)
+            val historyTrackAdapter = TrackAdapter(::startPlayer)
             it.recyclerHistoryList.adapter = historyTrackAdapter
             searchHistory = SearchHistory(getSharedPreferences(SearchHistory.SHARED_PREFERENCE_HISTORY, MODE_PRIVATE), historyTrackAdapter.tracks)
 
@@ -124,7 +122,7 @@ class SearchActivity : AppCompatActivity() {
                     /* обработку события unspecified сделала для упрощения отладки - при нажатии клавиши enter
                      на реальной клавиатуре именно этот тип IME события вызывается */
                     if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
-                        trackApiService.getTracks(searchLine.text.toString())
+                        trackApiService.getTracks(searchLine.text.toString().replace(" ","+"))
                             .enqueue(object : Callback<TracksResponse> {
                                 override fun onResponse(
                                     call: Call<TracksResponse>,
@@ -132,7 +130,7 @@ class SearchActivity : AppCompatActivity() {
                                 ) {
                                     if (response.isSuccessful) {
                                         searchTrackAdapter.tracks.clear()
-                                        if (response.body()?.results?.isNotEmpty() ?: false) {
+                                        if (response.body()?.results?.isNotEmpty() == true) {
                                             searchTrackAdapter.tracks.addAll(response.body()?.results!!)
                                             showSearchResult(it.recyclerTrackList)
                                         } else {
@@ -212,6 +210,11 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun addTrackAndStartPlayer(track: Track) {
+        addTrack(track)
+        startPlayer(track)
+    }
+
     private fun hideKeyboard() {
         val inputMethodManager =
             getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -225,5 +228,11 @@ class SearchActivity : AppCompatActivity() {
             hideHistory()
             binding?.recyclerHistoryList?.adapter?.notifyDataSetChanged()
         }
+    }
+
+    private fun startPlayer(track: Track) {
+        (application as PlaylistMakerApplication).actualTrack = track
+        val playerIntent = Intent(this, PlayerActivity::class.java)
+        startActivity(playerIntent)
     }
 }
