@@ -26,16 +26,6 @@ class PlayerActivity : AppCompatActivity() {
 
         binding?.let {
 
-            /* tested by
-            val track = Gson().fromJson("{\"trackId\":111222333," +
-                    "\"trackName\":\"Hello\"," +
-                    "\"artistName\":\"Artist\"," +
-                    "\"trackTimeMillis\":1000000," + /*"\"artworkUrl100\": \"\"," + "\"collectionName\": \"\"," + */
-                    "\"releaseDate\":\"1999-87987-768768\"," +
-                    "\"primaryGenreName\":\"Pop\"," +
-                    "\"country\":\"USA\"}", Track::class.java) */
-
-
             it.playerTrackName.text = track.trackName
             it.playerTrackName.isSelected = true            // to start animation
             it.playerArtistName.text = track.artistName
@@ -58,7 +48,7 @@ class PlayerActivity : AppCompatActivity() {
     private fun bindCover() {
         binding?.let {
             Glide.with(it.root)
-                .load(track?.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg") ?: "")
+                .load(track?.getTrackArtworkUrl512() ?: "")
                 .placeholder(R.drawable.cover_placeholder)
                 .centerCrop()
                 .transform(RoundedCorners(GraphicUtils.dpToPx(8.0f, it.root)))

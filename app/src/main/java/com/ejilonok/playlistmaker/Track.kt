@@ -32,11 +32,15 @@ class Track (
     }
 
     override fun toString(): String {
-        return "$trackId: $artistName - $trackName (${getTrackTimeString()}) from [${collectionName ?: null}], RD:[$releaseDate], primaryGenre=${primaryGenreName}, country=$country"
+        return "$trackId: $artistName - $trackName (${getTrackTimeString()}) from [${collectionName ?: ""}], RD:[$releaseDate], primaryGenre=${primaryGenreName}, country=$country"
     }
 
     fun getTrackTimeString() : String {
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(trackTimeMillis)
+    }
+
+    fun getTrackArtworkUrl512() : String {
+        return artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg") ?: ""
     }
 
 }
