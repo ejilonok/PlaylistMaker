@@ -3,8 +3,9 @@ package com.ejilonok.playlistmaker
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.PersistableBundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,20 +14,29 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.ejilonok.playlistmaker.databinding.ActivitySearchBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+
 class SearchActivity : AppCompatActivity() {
     private var searchString : String? = SEARCH_STRING_DEF
     private var binding : ActivitySearchBinding? = null
     private var searchHistory : SearchHistory? = null
+    private var trackApiService : TrackApiService? = null
+    private var searchTrackAdapter : TrackAdapter? = null
+    private val searchRunnable = Runnable {searchTracks()}
+    private val handler = Handler(Looper.getMainLooper())
+    private var lastSearchText : String = ""
 
     companion object {
-        const val SEARCH_STRING = "SEARCH_STRING"
-        const val SEARCH_STRING_DEF = ""
+        private const val SEARCH_STRING = "SEARCH_STRING"
+        private const val SEARCH_STRING_DEF = ""
+
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
         super.onSaveInstanceState(outState, outPersistentState)
@@ -52,7 +62,7 @@ class SearchActivity : AppCompatActivity() {
             val searchLine = it.searchLine
             searchLine.setText(searchString)
 
-            val searchTrackAdapter = TrackAdapter(::addTrackAndStartPlayer)
+            searchTrackAdapter = TrackAdapter(::addTrackAndStartPlayer)
             it.recyclerTrackList.adapter = searchTrackAdapter
 
             val historyTrackAdapter = TrackAdapter(::startPlayer)
@@ -97,6 +107,7 @@ class SearchActivity : AppCompatActivity() {
                     }
 
                     searchString = s?.toString() ?: ""
+                    searchDebounce()
                 }
 
                 override fun afterTextChanged(s: Editable?) {
@@ -113,44 +124,66 @@ class SearchActivity : AppCompatActivity() {
 
             it.searchBackButton.setOnClickListener { this.finish() }
 
-            val trackApiService = (application as PlaylistMakerApplication).getTrackApiService()
-
-            if (trackApiService == null) {
-                Toast.makeText(this, getString(R.string.api_exception), Toast.LENGTH_LONG).show()
-            } else {
-                searchLine.setOnEditorActionListener { _, actionId, _ ->
-                    /* обработку события unspecified сделала для упрощения отладки - при нажатии клавиши enter
-                     на реальной клавиатуре именно этот тип IME события вызывается */
-                    if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
-                        trackApiService.getTracks(searchLine.text.toString().replace(" ","+"))
-                            .enqueue(object : Callback<TracksResponse> {
-                                override fun onResponse(
-                                    call: Call<TracksResponse>,
-                                    response: Response<TracksResponse>
-                                ) {
-                                    if (response.isSuccessful) {
-                                        searchTrackAdapter.tracks.clear()
-                                        if (response.body()?.results?.isNotEmpty() == true) {
-                                            searchTrackAdapter.tracks.addAll(response.body()?.results!!)
-                                            showSearchResult(it.recyclerTrackList)
-                                        } else {
-                                            showSearchResult(it.searchError)
-                                        }
-                                    } else {
-                                        showSearchResult(it.serverError)
-                                    }
-                                }
-
-                                override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
-                                    showSearchResult(it.serverError)
-                                }
-                            })
-                        true
-                    } else false
-                }
-            }
+            trackApiService = (application as PlaylistMakerApplication).getTrackApiService()
 
             showHistory()
+        }
+    }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        if (getPreparedSearchString().isEmpty()) return // если поле ввода оказалось пустым, мы не осуществляем поиск
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun getPreparedSearchString() : String {
+        return searchString?.replace(" ","+") ?: ""
+    }
+
+    private fun showFatalError(text : String) {
+        Toast.makeText(this, text , Toast.LENGTH_LONG).show()
+    }
+
+    private fun searchTracks() {
+        val searchText = getPreparedSearchString()
+
+        if (lastSearchText == searchText) return
+
+        if (trackApiService == null) {
+            showFatalError(getString(R.string.api_exception))
+            return
+        }
+
+        if (searchTrackAdapter == null) {
+            showFatalError(getString(R.string.internal_error))
+        }
+
+        binding?.let {
+            trackApiService!!.getTracks(searchText)
+                .enqueue(object : Callback<TracksResponse> {
+                    override fun onResponse(
+                        call: Call<TracksResponse>,
+                        response: Response<TracksResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            searchTrackAdapter!!.tracks.clear()
+                            if (response.body()?.results?.isNotEmpty() == true) {
+                                searchTrackAdapter!!.tracks.addAll(response.body()?.results!!)
+                                showSearchResult(it.recyclerTrackList)
+                            } else {
+                                showSearchResult(it.searchError)
+                            }
+                        } else {
+                            showSearchResult(it.serverError)
+                        }
+                    }
+
+                    override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
+                        showSearchResult(it.serverError)
+                    }
+                })
+
+            lastSearchText = searchText
         }
     }
 
