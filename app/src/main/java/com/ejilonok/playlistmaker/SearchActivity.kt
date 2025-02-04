@@ -31,12 +31,14 @@ class SearchActivity : AppCompatActivity() {
     private val searchRunnable = Runnable {searchTracks()}
     private val handler = Handler(Looper.getMainLooper())
     private var lastSearchText : String = ""
+    private var isClickAllowed = true
 
     companion object {
         private const val SEARCH_STRING = "SEARCH_STRING"
         private const val SEARCH_STRING_DEF = ""
 
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 600L
     }
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
         super.onSaveInstanceState(outState, outPersistentState)
@@ -248,7 +250,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun addTrack(track : Track) {
+    private fun addTrackToHistory(track : Track) {
         searchHistory?.let {
             it.addTrack(track)
             binding?.recyclerHistoryList?.adapter?.notifyDataSetChanged()
@@ -256,7 +258,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun addTrackAndStartPlayer(track: Track) {
-        addTrack(track)
+        addTrackToHistory(track)
         startPlayer(track)
     }
 
@@ -277,7 +279,17 @@ class SearchActivity : AppCompatActivity() {
 
     private fun startPlayer(track: Track) {
         (application as PlaylistMakerApplication).actualTrack = track
-        val playerIntent = Intent(this, PlayerActivity::class.java)
-        startActivity(playerIntent)
+        if (clickDebounce()) {
+            val playerIntent = Intent(this, PlayerActivity::class.java)
+            startActivity(playerIntent)
+        }
+    }
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
     }
 }
