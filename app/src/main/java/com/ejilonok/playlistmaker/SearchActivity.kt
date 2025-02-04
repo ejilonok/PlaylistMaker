@@ -159,6 +159,9 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding?.let {
+            hideHistory()
+            hideSearchResults()
+            showProgressBar()
             trackApiService!!.getTracks(searchText)
                 .enqueue(object : Callback<TracksResponse> {
                     override fun onResponse(
@@ -185,6 +188,14 @@ class SearchActivity : AppCompatActivity() {
 
             lastSearchText = searchText
         }
+    }
+
+    private fun showProgressBar() {
+        binding?.searchProgressBar?.visibility = VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        binding?.searchProgressBar?.visibility = GONE
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -216,6 +227,7 @@ class SearchActivity : AppCompatActivity() {
             it.recyclerTrackList.visibility = GONE
             it.updateButton.visibility = GONE
         }
+        hideProgressBar()
     }
 
     @SuppressLint("NotifyDataSetChanged")
