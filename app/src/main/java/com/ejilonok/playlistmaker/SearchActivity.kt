@@ -10,7 +10,6 @@ import android.os.PersistableBundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View.*
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
@@ -82,7 +81,8 @@ class SearchActivity : AppCompatActivity() {
             }
 
             it.updateButton.setOnClickListener {
-                searchLine.onEditorAction(EditorInfo.IME_ACTION_DONE)
+                lastSearchText = ""
+                searchTracks()
             }
 
             it.clearHistoryButton.setOnClickListener {
