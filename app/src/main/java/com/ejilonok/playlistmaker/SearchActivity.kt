@@ -10,6 +10,7 @@ import android.os.PersistableBundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View.*
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
@@ -122,6 +123,14 @@ class SearchActivity : AppCompatActivity() {
                 if (hasFocus && searchLine.text.isNullOrEmpty()) showHistory() else hideHistory()
             }
             searchLine.requestFocus()
+            searchLine.setOnEditorActionListener { _, actionId, _ ->
+                /* обработку события unspecified сделала для упрощения отладки - при нажатии клавиши enter
+                 на реальной клавиатуре именно этот тип IME события вызывается */
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
+                    hideKeyboard()
+                    true
+                } else false
+            }
 
 
             it.searchBackButton.setOnClickListener { this.finish() }
@@ -204,7 +213,6 @@ class SearchActivity : AppCompatActivity() {
     private fun showSearchResult(recyclerView: RecyclerView) {
         binding?.let {
             hideHistory()
-            hideKeyboard()
             hideSearchResults()
             recyclerView.visibility = VISIBLE
             recyclerView.scrollToPosition(0)
@@ -215,7 +223,6 @@ class SearchActivity : AppCompatActivity() {
     private fun showSearchResult(textView : TextView) {
         binding?.let {
             hideHistory()
-            hideKeyboard()
             hideSearchResults()
             textView.visibility = VISIBLE
             if (textView === it.serverError) it.updateButton.visibility = VISIBLE
