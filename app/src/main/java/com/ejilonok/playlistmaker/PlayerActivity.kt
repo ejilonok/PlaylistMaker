@@ -110,7 +110,7 @@ class PlayerActivity : AppCompatActivity() {
                 if (currentState == STATE_PLAY) changeState()
             }
             binding.playButton.setOnClickListener { changeState() }
-            mediaPlayer.setOnCompletionListener{ currentState = STATE_STOP }
+            mediaPlayer.setOnCompletionListener { changeState(STATE_STOP) }
             mediaPlayer.prepareAsync()
         }
     }
@@ -175,13 +175,8 @@ class PlayerActivity : AppCompatActivity() {
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(this.currentPosition)
     }
     private fun updatePlayerInfo() {
-        when (currentState) {
-            STATE_PLAY -> {
-                handler.postDelayed(playerRunnable, DELAY_UPDATE)
-            }
-            STATE_STOP -> {
-                changeState()
-            }
+        if (currentState == STATE_PLAY) {
+            handler.postDelayed(playerRunnable, DELAY_UPDATE)
         }
 
         binding?.currentTimeTv?.text = mediaPlayer.getCurrentTimeString()
@@ -206,5 +201,10 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
         updatePlayerInfo()
+    }
+
+    private fun changeState(state : Int) {
+        currentState = state
+        changeState()
     }
 }
