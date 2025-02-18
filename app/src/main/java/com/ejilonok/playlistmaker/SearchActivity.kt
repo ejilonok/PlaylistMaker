@@ -164,25 +164,27 @@ class SearchActivity : AppCompatActivity() {
             showFatalError(getString(R.string.api_exception))
             return
         }
+        val trackApiServiceLocal = trackApiService as TrackApiService
 
         if (searchTrackAdapter == null) {
             showFatalError(getString(R.string.internal_error))
         }
+        val searchTrackAdapterLocal = searchTrackAdapter as TrackAdapter
 
         binding?.let {
             hideHistory()
             hideSearchResults()
             showProgressBar()
-            trackApiService!!.getTracks(searchText)
+            trackApiServiceLocal.getTracks(searchText)
                 .enqueue(object : Callback<TracksResponse> {
                     override fun onResponse(
                         call: Call<TracksResponse>,
                         response: Response<TracksResponse>
                     ) {
                         if (response.isSuccessful) {
-                            searchTrackAdapter!!.tracks.clear()
+                            searchTrackAdapterLocal.tracks.clear()
                             if (response.body()?.results?.isNotEmpty() == true) {
-                                searchTrackAdapter!!.tracks.addAll(response.body()?.results!!)
+                                searchTrackAdapterLocal.tracks.addAll(response.body()?.results!!)
                                 showSearchResult(it.recyclerTrackList)
                             } else {
                                 showSearchResult(it.searchError)
