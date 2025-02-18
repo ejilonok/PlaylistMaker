@@ -120,6 +120,14 @@
             android:text="@string/history_clear"/>
     </LinearLayout>
 
+    <ProgressBar android:id="@+id/search_progress_bar"
+        android:layout_width="@dimen/progress_bar_size"
+        android:layout_height="@dimen/progress_bar_size"
+        android:layout_marginTop="@dimen/progress_bar_margin"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/YP_Blue"
+        android:visibility="gone"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_track_list"
         android:layout_width="match_parent"

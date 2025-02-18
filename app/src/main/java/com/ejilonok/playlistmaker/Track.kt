@@ -15,7 +15,8 @@ class Track (
     val collectionName: String?, // Название альбома
     val releaseDate: String?, // Год релиза трека
     val primaryGenreName: String?, // Жанр трека
-    val country : String? // Страна исполнителя
+    val country : String?, // Страна исполнителя
+    val previewUrl : String // Ссылка на аудио-превью композиции
 )
 {
     override fun equals(other: Any?): Boolean {
@@ -24,7 +25,7 @@ class Track (
 
         other as Track
 
-        return trackId.equals(other.trackId)
+        return trackId == other.trackId
     }
 
     override fun hashCode(): Int {
@@ -32,7 +33,7 @@ class Track (
     }
 
     override fun toString(): String {
-        return "$trackId: $artistName - $trackName (${getTrackTimeString()}) from [${collectionName ?: ""}], RD:[$releaseDate], primaryGenre=${primaryGenreName}, country=$country"
+        return "$trackId: $artistName - $trackName (${getTrackTimeString()}) from [${collectionName ?: ""}], RD:[$releaseDate], primaryGenre=${primaryGenreName}, country=$country, previewUrl=$previewUrl"
     }
 
     fun getTrackTimeString() : String {
