@@ -1,4 +1,4 @@
-package com.ejilonok.playlistmaker
+package com.ejilonok.playlistmaker.presentation
 
 import android.util.TypedValue
 import android.view.View

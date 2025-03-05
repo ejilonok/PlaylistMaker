@@ -1,4 +1,4 @@
-package com.ejilonok.playlistmaker
+package com.ejilonok.playlistmaker.ui.library
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
