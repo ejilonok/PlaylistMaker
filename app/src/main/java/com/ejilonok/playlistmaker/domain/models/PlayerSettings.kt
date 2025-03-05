@@ -1,6 +1,6 @@
 package com.ejilonok.playlistmaker.domain.models
 
-class PlayerSettings(
+data class PlayerSettings(
     var state: STATES = DEFAULT_STATE,
     var position: Int = DEFAULT_POSITION ) {
 

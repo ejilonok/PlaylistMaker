@@ -9,17 +9,21 @@ import com.ejilonok.playlistmaker.data.repository.TracksSearchRepositoryImpl
 import com.ejilonok.playlistmaker.data.network.RetrofitItunesNetworkClient
 import com.ejilonok.playlistmaker.data.repository.PlayerSettingsRepositoryImpl
 import com.ejilonok.playlistmaker.data.repository.SearchHistoryRepositoryImpl
+import com.ejilonok.playlistmaker.data.repository.SearchSettingsRepositoryImpl
 import com.ejilonok.playlistmaker.data.repository.ThemeManagerImpl
 import com.ejilonok.playlistmaker.domain.api.interactors.PlayerInteractor
 import com.ejilonok.playlistmaker.domain.api.interactors.SearchHistoryInteractor
+import com.ejilonok.playlistmaker.domain.api.interactors.SearchSettingsInteractor
 import com.ejilonok.playlistmaker.domain.api.interactors.TrackInteractor
 import com.ejilonok.playlistmaker.domain.api.repository.PlayerSettingsRepository
 import com.ejilonok.playlistmaker.domain.api.repository.SearchHistoryRepository
+import com.ejilonok.playlistmaker.domain.api.repository.SearchSettingsRepository
 import com.ejilonok.playlistmaker.domain.api.repository.ThemeManager
 import com.ejilonok.playlistmaker.domain.api.repository.TracksSearchRepository
 import com.ejilonok.playlistmaker.domain.impl.SearchHistoryInteractorImpl
 import com.ejilonok.playlistmaker.domain.impl.TrackInteractorImpl
 import com.ejilonok.playlistmaker.domain.impl.PlayerInteractorImpl
+import com.ejilonok.playlistmaker.domain.impl.SearchSettingsInteractorImpl
 
 object Creator {
     fun provideTracksInteractor() : TrackInteractor {
@@ -36,6 +40,10 @@ object Creator {
 
     fun provideThemeInteractor(context: Context) : ThemeInteractor {
         return ThemeInteractorImpl(getThemeRepository(context), getThemeManager())
+    }
+
+    fun provideSearchSettingsInteractor() : SearchSettingsInteractor {
+        return SearchSettingsInteractorImpl(getSearchSettingsRepository())
     }
 
     private fun getTrackSearchRepository() : TracksSearchRepository {
@@ -56,5 +64,9 @@ object Creator {
 
     private fun getThemeManager() : ThemeManager {
         return ThemeManagerImpl()
+    }
+
+    private fun getSearchSettingsRepository() : SearchSettingsRepository {
+        return SearchSettingsRepositoryImpl()
     }
 }

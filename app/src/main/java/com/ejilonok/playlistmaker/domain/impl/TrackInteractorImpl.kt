@@ -12,10 +12,14 @@ class TrackInteractorImpl(private val repository : TracksSearchRepository) : Tra
     private val executor = Executors.newCachedThreadPool()
     override fun searchTracks(expression: String, consumer: TrackInteractor.TracksConsumer) {
         executor.execute {
-            when (val result = repository.searchTracks(expression)) {
+            when (val result = repository.searchTracks(getPreparedSearchString(expression))) {
                 is Resource.Success -> consumer.consume( ConsumerData.Data(result.data) )
                 is Resource.Error -> consumer.consume( ConsumerData.Error(ResponseCode.NO_ANSWER.code) )
             }
         }
+    }
+
+    private fun getPreparedSearchString(string : String): String {
+        return string.replace(" ", "+")
     }
 }

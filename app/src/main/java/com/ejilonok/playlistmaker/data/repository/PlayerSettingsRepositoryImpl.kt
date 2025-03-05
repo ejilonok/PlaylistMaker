@@ -1,5 +1,7 @@
 package com.ejilonok.playlistmaker.data.repository
 
+import com.ejilonok.playlistmaker.data.dto.PlayerSettingsDto
+import com.ejilonok.playlistmaker.data.dto.PlayerSettingsMapper
 import com.ejilonok.playlistmaker.domain.api.repository.PlayerSettingsRepository
 import com.ejilonok.playlistmaker.domain.models.PlayerSettings
 import com.ejilonok.playlistmaker.domain.models.PlayerSettings.Companion.DEFAULT_POSITION
@@ -23,11 +25,12 @@ class PlayerSettingsRepositoryImpl : PlayerSettingsRepository {
         if (position == null) {
             position = DEFAULT_POSITION
         }
-        return try {
-            PlayerSettings(STATES.entries[state], position)
+        val playerSettingsDto = try {
+            PlayerSettingsDto(STATES.entries[state], position)
         } catch (e : Exception) {
-            PlayerSettings(DEFAULT_STATE, position)
+            PlayerSettingsDto(DEFAULT_STATE, position)
         }
+        return PlayerSettingsMapper.map(playerSettingsDto)
     }
 
     override fun save(settings : PlayerSettings) : String {

@@ -26,7 +26,7 @@ import com.ejilonok.playlistmaker.ui.player.PlayerActivity
 
 class SearchActivity : AppCompatActivity() {
     private val tracksInteractor: TrackInteractor by lazy { Creator.provideTracksInteractor() }
-    private val searchSettings = SearchSettingsRepositoryImpl()
+    private val searchSettingsInteractor = Creator.provideSearchSettingsInteractor()
 
     private lateinit var binding: ActivitySearchBinding
     private val searchHistoryInteractor : SearchHistoryInteractor by lazy { Creator.provideSearchHistoryInteractor(applicationContext) }
@@ -34,23 +34,24 @@ class SearchActivity : AppCompatActivity() {
     private var lastSearchText: String = ""
 
     private val clickDebouncer = ClickDebouncer(CLICK_DEBOUNCE_DELAY)
-    private val searchDebounce = TextInputDebouncer({ searchTracks() }, SEARCH_DEBOUNCE_DELAY )
+    private val searchDebounce = TextInputDebouncer({ startSearchTracks() }, SEARCH_DEBOUNCE_DELAY )
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 600L
+        private const val SETTINGS_TAG = "SETTINGS"
     }
 
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
         super.onSaveInstanceState(outState, outPersistentState)
 
-        searchSettings.save(outState)
+        outState.putString(SETTINGS_TAG, searchSettingsInteractor.save())
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
 
-        searchSettings.load(savedInstanceState)
+        searchSettingsInteractor.load(savedInstanceState.getString(SETTINGS_TAG))
     }
 
 
@@ -76,7 +77,7 @@ class SearchActivity : AppCompatActivity() {
     private fun setupUpdateButton() {
         binding.updateButton.setOnClickListener {
             lastSearchText = ""
-            searchTracks()
+            startSearchTracks()
         }
     }
 
@@ -88,7 +89,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun setupSearchLine() {
         val searchLine = binding.searchLine
-        searchLine.setText(searchSettings.getSearchString())
+        searchLine.setText(searchSettingsInteractor.getSearchString())
 
         val clearTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(
@@ -112,7 +113,7 @@ class SearchActivity : AppCompatActivity() {
                     searchDebounce.execute()
                 }
 
-                searchSettings.saveSearchString(s)
+                searchSettingsInteractor.save(s)
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -148,12 +149,8 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun getPreparedSearchString(): String {
-        return searchSettings.getSearchString().replace(" ", "+")
-    }
-
-    private fun searchTracks() {
-        val searchText = getPreparedSearchString()
+    private fun startSearchTracks() {
+        val searchText = searchSettingsInteractor.getSearchString()
 
         if (lastSearchText == searchText) {
             showSearchResult()
@@ -164,28 +161,29 @@ class SearchActivity : AppCompatActivity() {
         hideSearchResults()
         showProgressBar()
 
-        tracksInteractor.searchTracks(searchText, object : TrackInteractor.TracksConsumer {
-            override fun consume(data: ConsumerData<List<Track>>) {
-                runOnUiThread {
-                    hideProgressBar()
-                    when (data) {
-                        is ConsumerData.Data -> {
-                            if (data.data.isEmpty()) {
-                                showSearchError()
-                            } else {
-                                (binding.recyclerTrackList.adapter as TrackAdapter).setItems(data.data)
-                                showSearchResult()
-                            }
-                        }
-                        is ConsumerData.Error -> {
-                            showServerError()
-                        }
-                    }
-                }
-            }
-        })
+        tracksInteractor.searchTracks(searchText) { data -> getSearchResults(data) }
 
         lastSearchText = searchText
+    }
+
+    private fun getSearchResults(data: ConsumerData<List<Track>>) {
+        runOnUiThread {
+            hideProgressBar()
+            when (data) {
+                is ConsumerData.Data -> {
+                    if (data.data.isEmpty()) {
+                        showSearchError()
+                    } else {
+                        (binding.recyclerTrackList.adapter as TrackAdapter).setItems(data.data)
+                        showSearchResult()
+                    }
+                }
+
+                is ConsumerData.Error -> {
+                    showServerError()
+                }
+            }
+        }
     }
 
     private fun showProgressBar() {
