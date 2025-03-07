@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View.*
+
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +21,8 @@ import com.ejilonok.playlistmaker.domain.models.Track
 import com.ejilonok.playlistmaker.presentation.tracks.TrackAdapter
 import com.ejilonok.playlistmaker.ui.common.ClickDebouncer
 import com.ejilonok.playlistmaker.ui.common.TextInputDebouncer
+import com.ejilonok.playlistmaker.ui.common.gone
+import com.ejilonok.playlistmaker.ui.common.show
 import com.ejilonok.playlistmaker.ui.player.PlayerActivity
 
 
@@ -103,12 +105,12 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s.isNullOrEmpty()) {
-                    binding.clearButton.visibility = GONE
+                    binding.clearButton.gone()
                     hideSearchResults()
                     showHistory()
                     searchDebounce.stop()
                 } else {
-                    binding.clearButton.visibility = VISIBLE
+                    binding.clearButton.show()
                     hideHistory()
                     searchDebounce.execute()
                 }
@@ -187,11 +189,11 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showProgressBar() {
-        binding.searchProgressBar.visibility = VISIBLE
+        binding.searchProgressBar.show()
     }
 
     private fun hideProgressBar() {
-        binding.searchProgressBar.visibility = GONE
+        binding.searchProgressBar.gone()
     }
 
     private fun showSearchResult() {
@@ -199,39 +201,43 @@ class SearchActivity : AppCompatActivity() {
         hideSearchResults()
 
         val recyclerView = binding.recyclerTrackList
-        recyclerView.visibility = VISIBLE
+        recyclerView.show()
         recyclerView.scrollToPosition(0)
     }
 
     private fun showServerError() {
         hideHistory()
         hideSearchResults()
-        binding.serverError.visibility = VISIBLE
-        binding.updateButton.visibility = VISIBLE
+        binding.serverError.show()
+        binding.updateButton.show()
     }
 
     private fun showSearchError() {
         hideHistory()
         hideSearchResults()
-        binding.searchError.visibility = VISIBLE
+        binding.searchError.show()
     }
 
     private fun hideSearchResults() {
-            binding.searchError.visibility = GONE
-            binding.serverError.visibility = GONE
-            binding.recyclerTrackList.visibility = GONE
-            binding.updateButton.visibility = GONE
-            binding.searchProgressBar.visibility = GONE
+            binding.searchError.gone()
+            binding.serverError.gone()
+            binding.recyclerTrackList.gone()
+            binding.updateButton.gone()
+            binding.searchProgressBar.gone()
     }
 
     private fun showHistory() {
         hideSearchResults()
         (binding.recyclerHistoryList.adapter as TrackAdapter).setItems( searchHistoryInteractor.load() )
-        binding.historyGroup.visibility = if (searchHistoryInteractor.isHistoryEmpty()) GONE else VISIBLE
+        if (searchHistoryInteractor.isHistoryEmpty()) {
+            binding.historyGroup.gone()
+        } else {
+            binding.historyGroup.show()
+        }
     }
 
     private fun hideHistory() {
-        binding.historyGroup.visibility = GONE
+        binding.historyGroup.gone()
     }
 
     @SuppressLint("NotifyDataSetChanged")

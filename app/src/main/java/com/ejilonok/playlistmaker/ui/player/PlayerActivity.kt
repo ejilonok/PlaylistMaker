@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.PersistableBundle
-import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.ejilonok.playlistmaker.PlaylistMakerApplication
@@ -15,6 +14,8 @@ import com.ejilonok.playlistmaker.domain.models.Track
 import com.ejilonok.playlistmaker.databinding.ActivityPlayerBinding
 import com.ejilonok.playlistmaker.presentation.GraphicUtils
 import com.ejilonok.playlistmaker.presentation.tracks.TrackExtensions.getTrackArtworkUrl512
+import com.ejilonok.playlistmaker.ui.common.gone
+import com.ejilonok.playlistmaker.ui.common.show
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding : ActivityPlayerBinding
@@ -115,11 +116,11 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun bindCollection() {
         if (track?.collectionName.isNullOrEmpty()) {
-            binding.collectionGroup.visibility = View.GONE
+            binding.collectionGroup.gone()
         } else {
             binding.playerCollectionNameTv.text = track!!.collectionName
             binding.playerCollectionNameTv.isSelected = true
-            binding.collectionGroup.visibility = View.VISIBLE
+            binding.collectionGroup.show()
         }
     }
 
@@ -129,9 +130,9 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         if (track!!.releaseDate.isEmpty()) {
-            binding.yearGroup.visibility = View.GONE
+            binding.yearGroup.gone()
         } else {
-            binding.yearGroup.visibility = View.VISIBLE
+            binding.yearGroup.show()
             binding.playerYearTv.text = track!!.releaseDate.take(4)
         }
     }
@@ -141,9 +142,9 @@ class PlayerActivity : AppCompatActivity() {
             return
 
         if (track!!.primaryGenreName.isEmpty()) {
-            binding.genreGroup.visibility = View.GONE
+            binding.genreGroup.gone()
         } else {
-            binding.genreGroup.visibility = View.VISIBLE
+            binding.genreGroup.show()
             binding.playerGenreTv.text = track!!.primaryGenreName
         }
     }
@@ -154,9 +155,9 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         if (track!!.country.isEmpty()) {
-            binding.countryGroup.visibility = View.GONE
+            binding.countryGroup.gone()
         } else {
-            binding.countryGroup.visibility = View.VISIBLE
+            binding.countryGroup.show()
             binding.playerCountryTv.text = track!!.country
         }
     }
