@@ -1,0 +1,9 @@
+package com.ejilonok.playlistmaker.search.ui
+
+import com.ejilonok.playlistmaker.search.domain.models.Track
+
+object TrackExtensions {
+    fun Track.getTrackArtworkUrl512() : String {
+        return artworkUrl100.replaceAfterLast('/', "512x512bb.jpg")
+    }
+}

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/SecondaryLayout"
-    tools:context=".ui.library.LibraryActivity">
+    tools:context=".library.ui.LibraryActivity">
         <LinearLayout
             style="@style/SecondaryLayoutTitle"
             android:layout_width="match_parent"
