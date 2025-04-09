@@ -109,12 +109,12 @@ class SearchActivity : AppCompatActivity(), SearchView {
             is SearchState.History -> showHistory(state.tracks)
             SearchState.EmptyScreen -> showEmptyScreen()
             SearchState.Loading -> showLoading()
-            SearchState.SearchError -> showEmptySearchResult()
+            SearchState.EmptySearchResult -> showEmptySearchResult()
             SearchState.ServerError -> showServerError()
         }
     }
 
-    override fun showEmptyScreen() {
+    private fun showEmptyScreen() {
         hideHistory()
         hideSearchResults()
         hideProgressBar()
@@ -128,7 +128,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
         binding.searchProgressBar.gone()
     }
 
-    override fun showSearchResult(tracks: List<Track>) {
+    private fun showSearchResult(tracks: List<Track>) {
         setTrackList(tracks)
         showSearchResult()
     }
@@ -143,7 +143,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
         recyclerView.scrollToPosition(0)
     }
 
-    override fun showServerError() {
+    private fun showServerError() {
         hideHistory()
         hideSearchResults()
         binding.serverError.show()
@@ -158,7 +158,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
         }
     }
 
-    override fun showEmptySearchResult() {
+    private fun showEmptySearchResult() {
         hideHistory()
         hideSearchResults()
         binding.searchError.show()
@@ -172,7 +172,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
         binding.searchProgressBar.gone()
     }
 
-    override fun showHistory(actualHistory: List<Track>) {
+    private fun showHistory(actualHistory: List<Track>) {
         hideSearchResults()
         hideProgressBar()
         (binding.recyclerHistoryList.adapter as TrackAdapter).setItems(actualHistory)
@@ -186,7 +186,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
         hideKeyboard()
     }
 
-    override fun showLoading() {
+    private fun showLoading() {
         hideSearchResults()
         hideHistory()
         showProgressBar()

@@ -55,7 +55,7 @@ class SearchPresenter(
         if (hasFocus) {
             showHistory()
         } else {
-            searchView.showEmptyScreen()
+            searchView.render(SearchState.EmptyScreen)
         }
     }
 
@@ -74,9 +74,9 @@ class SearchPresenter(
     private fun showHistory() {
         val history = searchHistoryInteractor.load()
         if (history.isEmpty()) {
-            searchView.showEmptyScreen()
+            searchView.render(SearchState.EmptyScreen)
         } else {
-            searchView.showHistory(history)
+            searchView.render(SearchState.History(history))
         }
     }
 
@@ -94,7 +94,7 @@ class SearchPresenter(
 
     private fun startSearchTracks() {
         if (!tracksInteractor.isNetworkConnected()) {
-            searchView.showServerError()
+            searchView.render(SearchState.ServerError)
             return
         }
 
@@ -103,7 +103,7 @@ class SearchPresenter(
             return
         }
 
-        searchView.showLoading()
+        searchView.render(SearchState.Loading)
 
         tracksInteractor.searchTracks(searchString) { data -> searchActivity.runOnUiThread {getSearchResults(data)} }
 
@@ -114,14 +114,14 @@ class SearchPresenter(
         when (data) {
             is ConsumerData.Data -> {
                 if (data.data.isEmpty()) {
-                    searchView.showEmptySearchResult()
+                    searchView.render(SearchState.EmptySearchResult)
                 } else {
-                    searchView.showSearchResult(data.data)
+                    searchView.render(SearchState.Content(data.data))
                 }
             }
 
             is ConsumerData.Error -> {
-                searchView.showServerError()
+                searchView.render(SearchState.ServerError)
             }
         }
     }
