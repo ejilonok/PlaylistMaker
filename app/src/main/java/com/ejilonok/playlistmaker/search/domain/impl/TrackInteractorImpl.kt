@@ -19,6 +19,10 @@ class TrackInteractorImpl(private val repository : TracksSearchRepository) : Tra
         }
     }
 
+    override fun isNetworkConnected(): Boolean {
+        return repository.isNetworkConnected()
+    }
+
     private fun getPreparedSearchString(string : String): String {
         return string.replace(" ", "+")
     }

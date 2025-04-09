@@ -9,12 +9,20 @@ class ClickDebouncer(val debounceDelay : Long ) {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, debounceDelay)
+            handler.postDelayed(
+                { isClickAllowed = true },
+                DEBOUNCE_TOKEN,
+                debounceDelay)
         }
         return current
     }
 
+    fun onDestroy() {
+        handler.removeCallbacksAndMessages(DEBOUNCE_TOKEN)
+    }
+
     companion object {
         private val handler = Handler(Looper.getMainLooper())
+        private val DEBOUNCE_TOKEN = Any()
     }
 }

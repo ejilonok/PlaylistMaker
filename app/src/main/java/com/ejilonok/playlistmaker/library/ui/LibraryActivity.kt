@@ -5,16 +5,19 @@ import androidx.appcompat.app.AppCompatActivity
 import com.ejilonok.playlistmaker.databinding.ActivityLibraryBinding
 
 class LibraryActivity : AppCompatActivity() {
-    private var binding: ActivityLibraryBinding? = null
+    private lateinit var binding : ActivityLibraryBinding
+    private lateinit var libraryModel : LibraryViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLibraryBinding.inflate(layoutInflater)
-        binding?.let {
-            setContentView(it.root)
+        setContentView(binding.root)
 
-            it.libraryBackButton.setOnClickListener {
-                finish()
-            }
-        }
+        libraryModel = LibraryViewModel(this, binding)
+        libraryModel.onCreate()
+    }
+
+    override fun onDestroy() {
+        libraryModel.onDestroy()
+        super.onDestroy()
     }
 }

@@ -14,6 +14,10 @@ class TextInputDebouncer(val runnable : Runnable, val delay : Long) {
         handler.removeCallbacks(runnable)
     }
 
+    fun onDestroy() {
+        stop()
+    }
+
     companion object {
         private val handler = Handler(Looper.getMainLooper())
     }

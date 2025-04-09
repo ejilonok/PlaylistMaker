@@ -5,6 +5,7 @@ sealed interface Resource<T> {
     class Error<T>(val errCode : Int) : Resource<T>
 
     enum class ResourceErrorCodes(val code : Int) {
-        NETWORK_ERROR(-1)
+        NETWORK_ERROR(-1),
+        NETWORK_DISCONNECTED(-2)
     }
 }

@@ -5,4 +5,5 @@ import com.ejilonok.playlistmaker.search.domain.models.Track
 
 interface TracksSearchRepository {
     fun searchTracks(expression: String): Resource<List<Track>>
+    fun isNetworkConnected() : Boolean
 }

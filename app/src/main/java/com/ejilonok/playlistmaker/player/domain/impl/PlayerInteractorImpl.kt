@@ -1,6 +1,5 @@
 package com.ejilonok.playlistmaker.player.domain.impl
 
-//TODO использование пакета MediaPlayer должно быть либо в data, либо в ui слое
 import android.media.MediaPlayer
 import com.ejilonok.playlistmaker.main.domain.consumer.SimpleConsumer
 import com.ejilonok.playlistmaker.player.domain.api.interactor.PlayerInteractor
@@ -13,6 +12,7 @@ import java.util.Locale
 class PlayerInteractorImpl(
     private val playerSettingsRepository: PlayerSettingsRepository
 ) : PlayerInteractor {
+    // TODO: нужно перенести mediaplayer или в data, или в ui
     private val mediaPlayer = MediaPlayer()
     private var playerSettings = PlayerSettings()
     private val formater = SimpleDateFormat("mm:ss", Locale.getDefault())

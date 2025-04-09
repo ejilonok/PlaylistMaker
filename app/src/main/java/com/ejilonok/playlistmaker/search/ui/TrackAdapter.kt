@@ -7,7 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ejilonok.playlistmaker.search.domain.models.Track
 import com.ejilonok.playlistmaker.databinding.TrackCardBinding
 
-class TrackAdapter(private var tracks : List<Track> = arrayListOf(), private val trackClickListener: (Track) -> Unit) : RecyclerView.Adapter<TrackViewHolder>() {
+class TrackAdapter(
+    private var tracks : List<Track> = arrayListOf(),
+    private val trackClickListener: (Track) -> Unit) : RecyclerView.Adapter<TrackViewHolder>() {
     @SuppressLint("NotifyDataSetChanged")
     fun setItems(tracks: List<Track>) {
         this.tracks = tracks
