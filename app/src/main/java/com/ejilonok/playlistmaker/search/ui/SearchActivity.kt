@@ -1,98 +1,71 @@
 package com.ejilonok.playlistmaker.search.ui
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.text.Editable
 import android.text.TextWatcher
-
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import com.ejilonok.playlistmaker.creator.Creator
-import com.ejilonok.playlistmaker.main.PlaylistMakerApplication
-import com.ejilonok.playlistmaker.main.domain.consumer.ConsumerData
-import com.ejilonok.playlistmaker.main.ui.common.ClickDebouncer
-import com.ejilonok.playlistmaker.main.ui.common.TextInputDebouncer
-import com.ejilonok.playlistmaker.main.ui.common.*
-import com.ejilonok.playlistmaker.search.domain.api.interactor.SearchHistoryInteractor
-import com.ejilonok.playlistmaker.search.domain.api.interactor.TrackInteractor
-import com.ejilonok.playlistmaker.search.domain.models.Track
-//TODO перенести взаимодействие с playeractivity
-import com.ejilonok.playlistmaker.player.ui.PlayerActivity
 import com.ejilonok.playlistmaker.databinding.ActivitySearchBinding
+import com.ejilonok.playlistmaker.main.ui.common.gone
+import com.ejilonok.playlistmaker.main.ui.common.show
+import com.ejilonok.playlistmaker.search.domain.models.Track
+import com.ejilonok.playlistmaker.search.presenatation.SearchPresenter
+import com.ejilonok.playlistmaker.search.presenatation.SearchState
+import com.ejilonok.playlistmaker.search.presenatation.SearchView
 
 
-class SearchActivity : AppCompatActivity() {
-    private val tracksInteractor: TrackInteractor by lazy { Creator.provideTracksInteractor() }
-    private val searchSettingsInteractor = Creator.provideSearchSettingsInteractor()
-
+class SearchActivity : AppCompatActivity(), SearchView {
     private lateinit var binding: ActivitySearchBinding
-    private val searchHistoryInteractor : SearchHistoryInteractor by lazy { Creator.provideSearchHistoryInteractor(applicationContext) }
+    private lateinit var searchPresenter: SearchPresenter
+    private var textWatcher : TextWatcher? = null
 
-    private var lastSearchText: String = ""
-
-    private val clickDebouncer = ClickDebouncer(CLICK_DEBOUNCE_DELAY)
-    private val searchDebounce = TextInputDebouncer({ startSearchTracks() }, SEARCH_DEBOUNCE_DELAY )
-
-    companion object {
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private const val CLICK_DEBOUNCE_DELAY = 600L
-        private const val SETTINGS_TAG = "SETTINGS"
-    }
-
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        super.onSaveInstanceState(outState, outPersistentState)
-
-        outState.putString(SETTINGS_TAG, searchSettingsInteractor.save())
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-
-        searchSettingsInteractor.load(savedInstanceState.getString(SETTINGS_TAG))
-    }
-
-
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        binding.recyclerTrackList.adapter = TrackAdapter (trackClickListener =  ::addTrackAndStartPlayer )
-        binding.recyclerHistoryList.adapter = TrackAdapter(searchHistoryInteractor.load(), ::startPlayer)
+        setContentView(binding.root)
+        searchPresenter = Creator.provideSearchPresenter(this,this)
+
+        binding.recyclerTrackList.adapter = TrackAdapter { track ->
+            searchPresenter.addTrackAndStartPlayer(track)
+        }
+        binding.recyclerHistoryList.adapter = TrackAdapter {track ->
+            searchPresenter.startPlayer(track)
+        }
 
         setupClearHistoryButton()
         setupSearchLine()
         setupClearButton()
         setupUpdateButton()
 
-        binding.searchBackButton.setOnClickListener { this.finish() }
+        binding.searchBackButton.setOnClickListener { finish() }
+        searchPresenter.onCreate()
+    }
 
-        showHistory()
+    override fun onDestroy() {
+        searchPresenter.onDestroy()
+        textWatcher?.let { binding.searchLine.removeTextChangedListener(it) }
+        super.onDestroy()
     }
 
     private fun setupUpdateButton() {
         binding.updateButton.setOnClickListener {
-            lastSearchText = ""
-            startSearchTracks()
+            searchPresenter.updateSearch()
         }
     }
 
     private fun setupClearHistoryButton() {
         binding.clearHistoryButton.setOnClickListener {
-            clearHistory()
+            searchPresenter.clearHistory()
         }
     }
 
     private fun setupSearchLine() {
         val searchLine = binding.searchLine
-        searchLine.setText(searchSettingsInteractor.getSearchString())
 
-        val clearTextWatcher = object : TextWatcher {
+        textWatcher = object : TextWatcher {
             override fun beforeTextChanged(
                 s: CharSequence?,
                 start: Int,
@@ -103,88 +76,48 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.isNullOrEmpty()) {
-                    binding.clearButton.gone()
-                    hideSearchResults()
-                    showHistory()
-                    searchDebounce.stop()
-                } else {
-                    binding.clearButton.show()
-                    hideHistory()
-                    searchDebounce.execute()
-                }
-
-                searchSettingsInteractor.save(s)
+                searchPresenter.searchTextChanged(s)
             }
 
             override fun afterTextChanged(s: Editable?) {
-
             }
         }
 
-        searchLine.addTextChangedListener(clearTextWatcher)
+        searchLine.addTextChangedListener(textWatcher)
         searchLine.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && searchLine.text.isNullOrEmpty()) showHistory() else hideHistory()
+            searchPresenter.searchFocusChangeListener(hasFocus)
         }
 
         searchLine.requestFocus()
         searchLine.setOnEditorActionListener { _, actionId, _ ->
-            /* обработку события unspecified сделала для упрощения отладки - при нажатии клавиши enter
-             на реальной клавиатуре именно этот тип IME события вызывается */
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
-                hideKeyboard()
-                true
-            } else false
+            searchPresenter.onSearchEditorAction(actionId)
         }
     }
 
     private fun setupClearButton() {
         binding.clearButton.setOnClickListener {
-            binding.searchLine.setText("")
+            searchPresenter.onClickClearButton()
+        }
+    }
+    override fun setSearchLineText(text : String) {
+        binding.searchLine.setText(text)
+    }
 
-            hideKeyboard()
-            binding.searchLine.clearFocus()
-
-            hideSearchResults()
-            showHistory()
+    override fun render(state: SearchState) {
+        when (state) {
+            is SearchState.Content -> showSearchResult(state.tracks)
+            is SearchState.History -> showHistory(state.tracks)
+            SearchState.EmptyScreen -> showEmptyScreen()
+            SearchState.Loading -> showLoading()
+            SearchState.SearchError -> showEmptySearchResult()
+            SearchState.ServerError -> showServerError()
         }
     }
 
-    private fun startSearchTracks() {
-        val searchText = searchSettingsInteractor.getSearchString()
-
-        if (lastSearchText == searchText) {
-            showSearchResult()
-            return
-        }
-
+    override fun showEmptyScreen() {
         hideHistory()
         hideSearchResults()
-        showProgressBar()
-
-        tracksInteractor.searchTracks(searchText) { data -> getSearchResults(data) }
-
-        lastSearchText = searchText
-    }
-
-    private fun getSearchResults(data: ConsumerData<List<Track>>) {
-        runOnUiThread {
-            hideProgressBar()
-            when (data) {
-                is ConsumerData.Data -> {
-                    if (data.data.isEmpty()) {
-                        showSearchError()
-                    } else {
-                        (binding.recyclerTrackList.adapter as TrackAdapter).setItems(data.data)
-                        showSearchResult()
-                    }
-                }
-
-                is ConsumerData.Error -> {
-                    showServerError()
-                }
-            }
-        }
+        hideProgressBar()
     }
 
     private fun showProgressBar() {
@@ -195,83 +128,82 @@ class SearchActivity : AppCompatActivity() {
         binding.searchProgressBar.gone()
     }
 
-    private fun showSearchResult() {
+    override fun showSearchResult(tracks: List<Track>) {
+        setTrackList(tracks)
+        showSearchResult()
+    }
+
+    override fun showSearchResult() {
         hideHistory()
         hideSearchResults()
+        hideProgressBar()
 
         val recyclerView = binding.recyclerTrackList
         recyclerView.show()
         recyclerView.scrollToPosition(0)
     }
 
-    private fun showServerError() {
+    override fun showServerError() {
         hideHistory()
         hideSearchResults()
         binding.serverError.show()
         binding.updateButton.show()
     }
 
-    private fun showSearchError() {
+    override fun setCanClearSearchLine(canClean: Boolean) {
+        if (canClean) {
+            binding.clearButton.show()
+        } else {
+            binding.clearButton.gone()
+        }
+    }
+
+    override fun showEmptySearchResult() {
         hideHistory()
         hideSearchResults()
         binding.searchError.show()
     }
 
     private fun hideSearchResults() {
-            binding.searchError.gone()
-            binding.serverError.gone()
-            binding.recyclerTrackList.gone()
-            binding.updateButton.gone()
-            binding.searchProgressBar.gone()
+        binding.searchError.gone()
+        binding.serverError.gone()
+        binding.recyclerTrackList.gone()
+        binding.updateButton.gone()
+        binding.searchProgressBar.gone()
     }
 
-    private fun showHistory() {
+    override fun showHistory(actualHistory: List<Track>) {
         hideSearchResults()
-        (binding.recyclerHistoryList.adapter as TrackAdapter).setItems( searchHistoryInteractor.load() )
-        if (searchHistoryInteractor.isHistoryEmpty()) {
-            binding.historyGroup.gone()
-        } else {
-            binding.historyGroup.show()
-        }
+        hideProgressBar()
+        (binding.recyclerHistoryList.adapter as TrackAdapter).setItems(actualHistory)
+        binding.historyGroup.show()
+        binding.recyclerHistoryList.scrollToPosition(0)
+    }
+
+    override fun showScreenWithoutFocus() {
+        showEmptyScreen()
+        binding.searchLine.clearFocus()
+        hideKeyboard()
+    }
+
+    override fun showLoading() {
+        hideSearchResults()
+        hideHistory()
+        showProgressBar()
     }
 
     private fun hideHistory() {
         binding.historyGroup.gone()
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun addTrackToHistory(track: Track) {
-            searchHistoryInteractor.addTrack(track , object : SearchHistoryInteractor.SearchHistoryConsumer {
-                override fun consume(actualHistory: List<Track>) {
-                    (binding.recyclerHistoryList.adapter as TrackAdapter).setItems(actualHistory)
-                    binding.recyclerHistoryList.adapter?.notifyDataSetChanged()
-                }
-            })
-    }
-
-    private fun addTrackAndStartPlayer(track: Track) {
-        addTrackToHistory(track)
-        startPlayer(track)
-    }
-
-    private fun hideKeyboard() {
+    override fun hideKeyboard() {
         val inputMethodManager =
             getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun clearHistory() {
-        searchHistoryInteractor.clear()
-        binding.recyclerHistoryList.adapter?.notifyDataSetChanged()
-        hideHistory()
-    }
 
-    private fun startPlayer(track: Track) {
-        (application as PlaylistMakerApplication).actualTrack = track
-        if (clickDebouncer.can()) {
-            val playerIntent = Intent(this, PlayerActivity::class.java)
-            startActivity(playerIntent)
-        }
+    private fun setTrackList(tracks: List<Track>) {
+        (binding.recyclerTrackList.adapter as TrackAdapter).setItems(tracks)
     }
 }
