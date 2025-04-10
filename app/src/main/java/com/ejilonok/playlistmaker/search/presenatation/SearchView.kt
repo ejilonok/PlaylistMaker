@@ -1,7 +1,5 @@
 package com.ejilonok.playlistmaker.search.presenatation
 
-import com.ejilonok.playlistmaker.search.domain.models.Track
-
 interface SearchView {
     fun render(state: SearchState)
     fun showScreenWithoutFocus()

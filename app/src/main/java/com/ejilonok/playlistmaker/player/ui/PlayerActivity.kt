@@ -3,7 +3,6 @@ package com.ejilonok.playlistmaker.player.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
-import com.ejilonok.playlistmaker.creator.Creator
 import com.ejilonok.playlistmaker.databinding.ActivityPlayerBinding
 
 class PlayerActivity : AppCompatActivity() {
@@ -12,11 +11,13 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
         playerViewModel = PlayerViewModel(this, binding)
-        playerViewModel.onCreate()
+        playerViewModel.onCreate(intent)
         playerViewModel.load(savedInstanceState)
     }
 

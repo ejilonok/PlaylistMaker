@@ -1,9 +1,19 @@
 package com.ejilonok.playlistmaker.main
 
 import android.app.Application
-//TODO здесь должно быть использование интерактора. Или перенести использование интерактора в другой модуль
-import com.ejilonok.playlistmaker.search.domain.models.Track
+import com.ejilonok.playlistmaker.creator.Creator
+import com.ejilonok.playlistmaker.search.presenatation.SearchPresenter
 
 class PlaylistMakerApplication : Application() {
-    var actualTrack : Track? = null
+    private var searchPresenter : SearchPresenter ?= null
+
+    fun getSearchPresenter() : SearchPresenter {
+        if (searchPresenter == null)
+            searchPresenter = Creator.provideSearchPresenter(this)
+        return searchPresenter!!
+    }
+
+    fun clearSearchPresenter() {
+        searchPresenter = null
+    }
 }

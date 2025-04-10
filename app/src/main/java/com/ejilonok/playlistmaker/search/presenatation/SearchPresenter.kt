@@ -1,9 +1,11 @@
 package com.ejilonok.playlistmaker.search.presenatation
 
+import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.view.inputmethod.EditorInfo
 import com.ejilonok.playlistmaker.creator.Creator
-import com.ejilonok.playlistmaker.main.PlaylistMakerApplication
 import com.ejilonok.playlistmaker.main.domain.consumer.ConsumerData
 import com.ejilonok.playlistmaker.main.ui.common.ClickDebouncer
 import com.ejilonok.playlistmaker.main.ui.common.TextInputDebouncer
@@ -11,22 +13,41 @@ import com.ejilonok.playlistmaker.player.ui.PlayerActivity
 import com.ejilonok.playlistmaker.search.domain.api.interactor.SearchHistoryInteractor
 import com.ejilonok.playlistmaker.search.domain.api.interactor.TrackInteractor
 import com.ejilonok.playlistmaker.search.domain.models.Track
-import com.ejilonok.playlistmaker.search.ui.SearchActivity
+import com.google.gson.Gson
 
 class SearchPresenter(
-    private val searchActivity: SearchActivity,
-    private val searchView: SearchView
+    private val context: Context
 ) {
-    private val tracksInteractor: TrackInteractor by lazy { Creator.provideTracksInteractor(searchActivity) }
+    private var searchView: SearchView? = null
+    private val tracksInteractor: TrackInteractor by lazy { Creator.provideTracksInteractor(context) }
     private var searchString : String = ""
-    private val searchHistoryInteractor : SearchHistoryInteractor by lazy { Creator.provideSearchHistoryInteractor(searchActivity.applicationContext) }
+    private val searchHistoryInteractor : SearchHistoryInteractor by lazy { Creator.provideSearchHistoryInteractor(context.applicationContext) }
     private var lastSearchText: String = ""
     private val clickDebouncer = ClickDebouncer(CLICK_DEBOUNCE_DELAY)
     private val searchDebounce = TextInputDebouncer({ startSearchTracks() }, SEARCH_DEBOUNCE_DELAY )
+    private var lastState: SearchState? = null
+    private var lastSearchResult = listOf<Track>()
 
     fun onCreate() {
-        searchView.setSearchLineText(searchString)
-        showSearchResults()
+        loadPresenterState()
+    }
+
+    private fun loadPresenterState() {
+        searchView?.setSearchLineText(searchString)
+        if (searchString.isEmpty()) {
+            showHistory()
+        } else {
+            lastState?.let { searchView?.render(it) }
+        }
+    }
+
+    fun attachView(searchView: SearchView) {
+        this.searchView = searchView
+        loadPresenterState()
+    }
+
+    fun detachView() {
+        searchView = null
     }
 
     fun onDestroy() {
@@ -34,17 +55,14 @@ class SearchPresenter(
         searchDebounce.onDestroy()
     }
 
-    private fun showSearchResults() {
-        if (searchString.isEmpty()) {
-            showHistory()
-        } else {
-            startSearchTracks()
-        }
+    private fun renderState(state: SearchState) {
+        lastState = state
+        searchView?.render(state)
     }
 
     fun onSearchEditorAction(actionId : Int) : Boolean {
         return if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
-            searchView.hideKeyboard()
+            searchView?.hideKeyboard()
             true
         } else {
             false
@@ -55,14 +73,14 @@ class SearchPresenter(
         if (hasFocus) {
             showHistory()
         } else {
-            searchView.render(SearchState.EmptyScreen)
+            renderState(SearchState.EmptyScreen)
         }
     }
 
     fun onClickClearButton() {
-        searchView.setSearchLineText("")
-        searchView.showScreenWithoutFocus()
-        searchView.setCanClearSearchLine(false)
+        searchView?.setSearchLineText("")
+        searchView?.showScreenWithoutFocus()
+        searchView?.setCanClearSearchLine(false)
         showHistory()
     }
 
@@ -74,19 +92,19 @@ class SearchPresenter(
     private fun showHistory() {
         val history = searchHistoryInteractor.load()
         if (history.isEmpty()) {
-            searchView.render(SearchState.EmptyScreen)
+            renderState(SearchState.EmptyScreen)
         } else {
-            searchView.render(SearchState.History(history))
+            renderState(SearchState.History(history))
         }
     }
 
     fun searchTextChanged(s: CharSequence?) {
         if (s.isNullOrEmpty()) {
-            searchView.setCanClearSearchLine(false)
+            searchView?.setCanClearSearchLine(false)
             showHistory()
             searchDebounce.stop()
         } else {
-            searchView.setCanClearSearchLine(true)
+            searchView?.setCanClearSearchLine(true)
             searchString = s.toString()
             searchDebounce.execute()
         }
@@ -94,18 +112,18 @@ class SearchPresenter(
 
     private fun startSearchTracks() {
         if (!tracksInteractor.isNetworkConnected()) {
-            searchView.render(SearchState.ServerError)
+            renderState(SearchState.ServerError)
             return
         }
 
-        if (lastSearchText == searchString) {
-            searchView.showSearchResult()
+        if ((lastSearchText == searchString) && (lastSearchResult.isNotEmpty())) {
+            renderState(SearchState.Content(lastSearchResult))
             return
         }
 
-        searchView.render(SearchState.Loading)
+        renderState(SearchState.Loading)
 
-        tracksInteractor.searchTracks(searchString) { data -> searchActivity.runOnUiThread {getSearchResults(data)} }
+        tracksInteractor.searchTracks(searchString) { data -> mainHandler.post {getSearchResults(data)} }
 
         lastSearchText = searchString
     }
@@ -113,15 +131,16 @@ class SearchPresenter(
     private fun getSearchResults(data: ConsumerData<List<Track>>) {
         when (data) {
             is ConsumerData.Data -> {
+                lastSearchResult = data.data
                 if (data.data.isEmpty()) {
-                    searchView.render(SearchState.EmptySearchResult)
+                    searchView?.render(SearchState.EmptySearchResult)
                 } else {
-                    searchView.render(SearchState.Content(data.data))
+                    searchView?.render(SearchState.Content(data.data))
                 }
             }
 
             is ConsumerData.Error -> {
-                searchView.render(SearchState.ServerError)
+                searchView?.render(SearchState.ServerError)
             }
         }
     }
@@ -145,14 +164,17 @@ class SearchPresenter(
 
     // TODO: перенести работу с вызовом активити в дата слой 
     fun startPlayer(track: Track) {
-        (searchActivity.application as PlaylistMakerApplication).actualTrack = track
         if (clickDebouncer.can()) {
-            val playerIntent = Intent(searchActivity, PlayerActivity::class.java)
-            searchActivity.startActivity(playerIntent)
+            val playerIntent = Intent(context, PlayerActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK  // Добавляем флаг
+                putExtra("TRACK_JSON", Gson().toJson(track))
+            }
+            context.startActivity(playerIntent)
         }
     }
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 600L
+        private val mainHandler = Handler(Looper.getMainLooper())
     }
 }

@@ -1,6 +1,7 @@
 package com.ejilonok.playlistmaker.player.ui
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -9,11 +10,11 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.ejilonok.playlistmaker.R
 import com.ejilonok.playlistmaker.creator.Creator
 import com.ejilonok.playlistmaker.databinding.ActivityPlayerBinding
-import com.ejilonok.playlistmaker.main.PlaylistMakerApplication
 import com.ejilonok.playlistmaker.main.ui.common.GraphicUtils
 import com.ejilonok.playlistmaker.main.ui.common.gone
 import com.ejilonok.playlistmaker.main.ui.common.show
 import com.ejilonok.playlistmaker.search.domain.models.Track
+import com.google.gson.Gson
 
 
 class PlayerViewModel(
@@ -22,11 +23,25 @@ class PlayerViewModel(
 ) {
     private var track : Track? = null
     private val playerInteractor = Creator.providePlayerInteractor()
-    //private var track : Track? = null
     private val handler = Handler(Looper.getMainLooper())
     private val playerRunnable = Runnable { updatePlayerInfo() }
-    fun onCreate() {
-        track = (activity.application as PlaylistMakerApplication).actualTrack
+    fun onCreate(intent: Intent) {
+        try {
+            val trackJson = intent.getStringExtra("TRACK_JSON")
+            track = Gson().fromJson( trackJson, Track::class.java )
+        } catch (e : Exception) {
+            track = Track(
+                0, // Уникальный идентификатор композиции, primary key.
+            "-----", // Название композиции
+                "-----", // Имя исполнителя
+            "0:00", // Продолжительность трека
+            "", // Ссылка на изображение обложки
+            "-----", // Название альбома
+            "0000", // Год релиза трека
+            "------", // Жанр трека
+            "------", // Страна исполнителя
+            "")
+        }
 
         enablePlayButton(false)
 
