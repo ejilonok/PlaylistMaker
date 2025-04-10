@@ -14,55 +14,33 @@ import com.ejilonok.playlistmaker.search.domain.api.interactor.SearchHistoryInte
 import com.ejilonok.playlistmaker.search.domain.api.interactor.TrackInteractor
 import com.ejilonok.playlistmaker.search.domain.models.Track
 import com.google.gson.Gson
+import moxy.MvpPresenter
 
 class SearchPresenter(
     private val context: Context
-) {
-    private var searchView: SearchView? = null
+)  : MvpPresenter<SearchView>() {
     private val tracksInteractor: TrackInteractor by lazy { Creator.provideTracksInteractor(context) }
     private var searchString : String = ""
     private val searchHistoryInteractor : SearchHistoryInteractor by lazy { Creator.provideSearchHistoryInteractor(context.applicationContext) }
     private var lastSearchText: String = ""
     private val clickDebouncer = ClickDebouncer(CLICK_DEBOUNCE_DELAY)
     private val searchDebounce = TextInputDebouncer({ startSearchTracks() }, SEARCH_DEBOUNCE_DELAY )
-    private var lastState: SearchState? = null
     private var lastSearchResult = listOf<Track>()
 
-    fun onCreate() {
-        loadPresenterState()
-    }
-
-    private fun loadPresenterState() {
-        searchView?.setSearchLineText(searchString)
-        if (searchString.isEmpty()) {
-            showHistory()
-        } else {
-            lastState?.let { searchView?.render(it) }
-        }
-    }
-
-    fun attachView(searchView: SearchView) {
-        this.searchView = searchView
-        loadPresenterState()
-    }
-
-    fun detachView() {
-        searchView = null
-    }
-
-    fun onDestroy() {
+    override fun onDestroy() {
         clickDebouncer.onDestroy()
         searchDebounce.onDestroy()
+
+        super.onDestroy()
     }
 
     private fun renderState(state: SearchState) {
-        lastState = state
-        searchView?.render(state)
+        viewState.render(state)
     }
 
     fun onSearchEditorAction(actionId : Int) : Boolean {
         return if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
-            searchView?.hideKeyboard()
+            viewState.hideKeyboard()
             true
         } else {
             false
@@ -78,9 +56,9 @@ class SearchPresenter(
     }
 
     fun onClickClearButton() {
-        searchView?.setSearchLineText("")
-        searchView?.showScreenWithoutFocus()
-        searchView?.setCanClearSearchLine(false)
+        viewState.setSearchLineText("")
+        viewState.showScreenWithoutFocus()
+        viewState.setCanClearSearchLine(false)
         showHistory()
     }
 
@@ -100,11 +78,11 @@ class SearchPresenter(
 
     fun searchTextChanged(s: CharSequence?) {
         if (s.isNullOrEmpty()) {
-            searchView?.setCanClearSearchLine(false)
+            viewState.setCanClearSearchLine(false)
             showHistory()
             searchDebounce.stop()
         } else {
-            searchView?.setCanClearSearchLine(true)
+            viewState.setCanClearSearchLine(true)
             searchString = s.toString()
             searchDebounce.execute()
         }
@@ -133,14 +111,14 @@ class SearchPresenter(
             is ConsumerData.Data -> {
                 lastSearchResult = data.data
                 if (data.data.isEmpty()) {
-                    searchView?.render(SearchState.EmptySearchResult)
+                    renderState(SearchState.EmptySearchResult)
                 } else {
-                    searchView?.render(SearchState.Content(data.data))
+                    renderState(SearchState.Content(data.data))
                 }
             }
 
             is ConsumerData.Error -> {
-                searchView?.render(SearchState.ServerError)
+                renderState(SearchState.ServerError)
             }
         }
     }

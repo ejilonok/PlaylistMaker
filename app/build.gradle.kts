@@ -1,6 +1,9 @@
+val moxyVersion = "2.2.2"
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -40,6 +43,9 @@ android {
 }
 
 dependencies {
+    implementation("com.github.moxy-community:moxy:$moxyVersion")
+    implementation("com.github.moxy-community:moxy-android:$moxyVersion")
+    kapt("com.github.moxy-community:moxy-compiler:$moxyVersion")
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.activity:activity-ktx:1.8.0")

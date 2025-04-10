@@ -5,29 +5,35 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
+import com.ejilonok.playlistmaker.creator.Creator
 import com.ejilonok.playlistmaker.databinding.ActivitySearchBinding
-import com.ejilonok.playlistmaker.main.PlaylistMakerApplication
 import com.ejilonok.playlistmaker.main.ui.common.gone
 import com.ejilonok.playlistmaker.main.ui.common.show
 import com.ejilonok.playlistmaker.search.domain.models.Track
 import com.ejilonok.playlistmaker.search.presenatation.SearchPresenter
 import com.ejilonok.playlistmaker.search.presenatation.SearchState
 import com.ejilonok.playlistmaker.search.presenatation.SearchView
+import moxy.MvpActivity
+import moxy.presenter.InjectPresenter
+import moxy.presenter.ProvidePresenter
 
 
-class SearchActivity : AppCompatActivity(), SearchView {
+class SearchActivity : MvpActivity(), SearchView {
     private lateinit var binding: ActivitySearchBinding
-    private lateinit var searchPresenter: SearchPresenter
     private var textWatcher : TextWatcher? = null
-    private val playlistMakerApplication : PlaylistMakerApplication by lazy { (application as PlaylistMakerApplication) }
+
+    @InjectPresenter
+    lateinit var searchPresenter: SearchPresenter
+
+    @ProvidePresenter
+    fun providePresenter(): SearchPresenter {
+        return Creator.provideSearchPresenter(context = this.applicationContext)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        searchPresenter = playlistMakerApplication.getSearchPresenter()
 
         binding.recyclerTrackList.adapter = TrackAdapter { track ->
             searchPresenter.addTrackAndStartPlayer(track)
@@ -42,40 +48,13 @@ class SearchActivity : AppCompatActivity(), SearchView {
         setupUpdateButton()
 
         binding.searchBackButton.setOnClickListener { finish() }
-        searchPresenter.attachView(this)
-        searchPresenter.onCreate()
     }
 
     override fun onDestroy() {
         textWatcher?.let { binding.searchLine.removeTextChangedListener(it) }
         searchPresenter.onDestroy()
-        searchPresenter.detachView()
-
-        if (isFinishing) {
-            playlistMakerApplication.clearSearchPresenter()
-        }
 
         super.onDestroy()
-    }
-
-    override fun onPause() {
-        searchPresenter.detachView()
-        super.onPause()
-    }
-
-    override fun onStop() {
-        searchPresenter.detachView()
-        super.onStop()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        searchPresenter.attachView(this)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        searchPresenter.attachView(this)
     }
 
     private fun setupUpdateButton() {
