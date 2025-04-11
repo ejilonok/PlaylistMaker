@@ -5,12 +5,14 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.ComponentActivity
+import androidx.lifecycle.ViewModelProvider
 import com.ejilonok.playlistmaker.creator.Creator
 import com.ejilonok.playlistmaker.databinding.ActivitySearchBinding
 import com.ejilonok.playlistmaker.main.ui.common.gone
 import com.ejilonok.playlistmaker.main.ui.common.show
 import com.ejilonok.playlistmaker.search.domain.models.Track
-import com.ejilonok.playlistmaker.search.presenatation.SearchPresenter
+import com.ejilonok.playlistmaker.search.presenatation.SearchViewModel
 import com.ejilonok.playlistmaker.search.presenatation.SearchState
 import com.ejilonok.playlistmaker.search.presenatation.SearchView
 import moxy.MvpActivity
@@ -18,28 +20,23 @@ import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 
 
-class SearchActivity : MvpActivity(), SearchView {
+class SearchActivity : ComponentActivity(), SearchView {
     private lateinit var binding: ActivitySearchBinding
     private var textWatcher : TextWatcher? = null
-
-    @InjectPresenter
-    lateinit var searchPresenter: SearchPresenter
-
-    @ProvidePresenter
-    fun providePresenter(): SearchPresenter {
-        return Creator.provideSearchPresenter(context = this.applicationContext)
-    }
+    private lateinit var searchViewModel: SearchViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        searchViewModel = ViewModelProvider(this,
+            SearchViewModel.getViewModelFactory(this.applicationContext))[SearchViewModel::class.java]
 
         binding.recyclerTrackList.adapter = TrackAdapter { track ->
-            searchPresenter.addTrackAndStartPlayer(track)
+            searchViewModel.addTrackAndStartPlayer(track)
         }
         binding.recyclerHistoryList.adapter = TrackAdapter {track ->
-            searchPresenter.startPlayer(track)
+            searchViewModel.startPlayer(track)
         }
 
         setupClearHistoryButton()
@@ -52,20 +49,20 @@ class SearchActivity : MvpActivity(), SearchView {
 
     override fun onDestroy() {
         textWatcher?.let { binding.searchLine.removeTextChangedListener(it) }
-        searchPresenter.onDestroy()
+        searchViewModel.onDestroy()
 
         super.onDestroy()
     }
 
     private fun setupUpdateButton() {
         binding.updateButton.setOnClickListener {
-            searchPresenter.updateSearch()
+            searchViewModel.updateSearch()
         }
     }
 
     private fun setupClearHistoryButton() {
         binding.clearHistoryButton.setOnClickListener {
-            searchPresenter.clearHistory()
+            searchViewModel.clearHistory()
         }
     }
 
@@ -83,7 +80,7 @@ class SearchActivity : MvpActivity(), SearchView {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                searchPresenter.searchTextChanged(s)
+                searchViewModel.searchTextChanged(s)
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -92,18 +89,18 @@ class SearchActivity : MvpActivity(), SearchView {
 
         searchLine.addTextChangedListener(textWatcher)
         searchLine.setOnFocusChangeListener { _, hasFocus ->
-            searchPresenter.searchFocusChangeListener(hasFocus)
+            searchViewModel.searchFocusChangeListener(hasFocus)
         }
 
         searchLine.requestFocus()
         searchLine.setOnEditorActionListener { _, actionId, _ ->
-            searchPresenter.onSearchEditorAction(actionId)
+            searchViewModel.onSearchEditorAction(actionId)
         }
     }
 
     private fun setupClearButton() {
         binding.clearButton.setOnClickListener {
-            searchPresenter.onClickClearButton()
+            searchViewModel.onClickClearButton()
         }
     }
     override fun setSearchLineText(text : String) {

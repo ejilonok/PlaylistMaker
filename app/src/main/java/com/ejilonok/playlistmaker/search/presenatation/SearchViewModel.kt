@@ -5,6 +5,9 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.view.inputmethod.EditorInfo
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
 import com.ejilonok.playlistmaker.creator.Creator
 import com.ejilonok.playlistmaker.main.domain.consumer.ConsumerData
 import com.ejilonok.playlistmaker.main.ui.common.ClickDebouncer
@@ -14,24 +17,22 @@ import com.ejilonok.playlistmaker.search.domain.api.interactor.SearchHistoryInte
 import com.ejilonok.playlistmaker.search.domain.api.interactor.TrackInteractor
 import com.ejilonok.playlistmaker.search.domain.models.Track
 import com.google.gson.Gson
-import moxy.MvpPresenter
 
-class SearchPresenter(
-    private val context: Context
-)  : MvpPresenter<SearchView>() {
-    private val tracksInteractor: TrackInteractor by lazy { Creator.provideTracksInteractor(context) }
+class SearchViewModel(
+    private val context: Context,
+    private val tracksInteractor: TrackInteractor,
+    private val searchHistoryInteractor : SearchHistoryInteractor
+)  : ViewModel() {
     private var searchString : String = ""
-    private val searchHistoryInteractor : SearchHistoryInteractor by lazy { Creator.provideSearchHistoryInteractor(context.applicationContext) }
+
     private var lastSearchText: String = ""
     private val clickDebouncer = ClickDebouncer(CLICK_DEBOUNCE_DELAY)
     private val searchDebounce = TextInputDebouncer({ startSearchTracks() }, SEARCH_DEBOUNCE_DELAY )
     private var lastSearchResult = listOf<Track>()
 
-    override fun onDestroy() {
+    fun onDestroy() {
         clickDebouncer.onDestroy()
         searchDebounce.onDestroy()
-
-        super.onDestroy()
     }
 
     private fun renderState(state: SearchState) {
@@ -154,5 +155,16 @@ class SearchPresenter(
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 600L
         private val mainHandler = Handler(Looper.getMainLooper())
+        fun getViewModelFactory(context: Context): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass : Class<T>,
+                                                    extras: CreationExtras): T {
+                    val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY])
+                    return SearchViewModel (application.applicationContext,
+                        Creator.provideTracksInteractor(application.applicationContext),
+                        Creator.provideSearchHistoryInteractor(application.applicationContext)) as T
+                }
+            }
     }
 }

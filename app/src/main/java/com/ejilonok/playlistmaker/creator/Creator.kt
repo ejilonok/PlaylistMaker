@@ -23,16 +23,13 @@ import com.ejilonok.playlistmaker.player.domain.api.repository.PlayerSettingsRep
 import com.ejilonok.playlistmaker.player.domain.impl.PlayerInteractorImpl
 import com.ejilonok.playlistmaker.player.data.repository.PlayerSettingsRepositoryImpl
 import com.ejilonok.playlistmaker.search.data.network.NetworkClient
-import com.ejilonok.playlistmaker.search.presenatation.SearchPresenter
+import com.ejilonok.playlistmaker.search.presenatation.SearchViewModel
 import com.ejilonok.playlistmaker.sharing.data.ExternalNavigatorImpl
 import com.ejilonok.playlistmaker.sharing.domain.api.interactor.SharingInteractor
 import com.ejilonok.playlistmaker.sharing.domain.api.repository.ExternalNavigator
 import com.ejilonok.playlistmaker.sharing.domain.impl.SharingInteractorImpl
 
 object Creator {
-    fun provideSearchPresenter(context: Context): SearchPresenter {
-        return SearchPresenter(context)
-    }
     fun provideTracksInteractor(context: Context) : TrackInteractor {
         return TrackInteractorImpl(getTrackSearchRepository(context))
     }
