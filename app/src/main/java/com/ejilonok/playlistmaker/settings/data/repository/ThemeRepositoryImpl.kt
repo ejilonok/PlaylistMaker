@@ -1,5 +1,6 @@
 package com.ejilonok.playlistmaker.settings.data.repository
 
+import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import com.ejilonok.playlistmaker.settings.data.dto.ThemeDto
@@ -7,10 +8,10 @@ import com.ejilonok.playlistmaker.settings.data.dto.ThemeMapper
 import com.ejilonok.playlistmaker.settings.domain.api.repository.ThemeRepository
 import com.ejilonok.playlistmaker.settings.domain.models.Theme
 
-class ThemeRepositoryImpl(private val context: Context) : ThemeRepository {
+class ThemeRepositoryImpl(private val application: Application) : ThemeRepository {
     override fun getSavedThemeState(): Theme {
-        val sharedPreferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
-        val nightMode = context.applicationContext.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        val sharedPreferences = application.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+        val nightMode = application.applicationContext.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         val systemTheme = if (nightMode == Configuration.UI_MODE_NIGHT_YES) Theme.THEMES.NIGHT.ordinal else Theme.THEMES.LIGHT.ordinal
         val themeDto = try {
             ThemeDto(Theme.THEMES.entries[sharedPreferences.getInt(THEME_TAG, systemTheme)])
@@ -21,7 +22,7 @@ class ThemeRepositoryImpl(private val context: Context) : ThemeRepository {
     }
 
     override fun saveThemeState(theme: Theme) {
-        val sharedPreferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+        val sharedPreferences = application.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         val themeDto = ThemeMapper.map(theme)
         editor.putInt(THEME_TAG, themeDto.currentTheme.ordinal)

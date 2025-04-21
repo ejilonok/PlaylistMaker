@@ -1,6 +1,6 @@
 package com.ejilonok.playlistmaker.creator
 
-import android.content.Context
+import android.app.Application
 import com.ejilonok.playlistmaker.main.data.NavigatorImpl
 import com.ejilonok.playlistmaker.main.domain.Navigator
 import com.ejilonok.playlistmaker.settings.domain.api.interactor.ThemeInteractor
@@ -23,62 +23,61 @@ import com.ejilonok.playlistmaker.player.domain.api.repository.PlayerSettingsRep
 import com.ejilonok.playlistmaker.player.domain.impl.PlayerInteractorImpl
 import com.ejilonok.playlistmaker.player.data.repository.PlayerSettingsRepositoryImpl
 import com.ejilonok.playlistmaker.search.data.network.NetworkClient
-import com.ejilonok.playlistmaker.search.presenatation.SearchViewModel
 import com.ejilonok.playlistmaker.sharing.data.ExternalNavigatorImpl
 import com.ejilonok.playlistmaker.sharing.domain.api.interactor.SharingInteractor
 import com.ejilonok.playlistmaker.sharing.domain.api.repository.ExternalNavigator
 import com.ejilonok.playlistmaker.sharing.domain.impl.SharingInteractorImpl
 
 object Creator {
-    fun provideTracksInteractor(context: Context) : TrackInteractor {
-        return TrackInteractorImpl(getTrackSearchRepository(context))
+    fun provideTracksInteractor(application: Application) : TrackInteractor {
+        return TrackInteractorImpl(getTrackSearchRepository(application))
     }
 
-    fun provideSearchHistoryInteractor(context : Context) : SearchHistoryInteractor {
-        return SearchHistoryInteractorImpl( getSearchHistoryRepository(context) )
+    fun provideSearchHistoryInteractor(application: Application) : SearchHistoryInteractor {
+        return SearchHistoryInteractorImpl( getSearchHistoryRepository(application) )
     }
 
     fun providePlayerInteractor() : PlayerInteractor {
         return PlayerInteractorImpl(getPlayerSettingsRepository())
     }
 
-    fun provideThemeInteractor(context: Context) : ThemeInteractor {
-        return ThemeInteractorImpl(getThemeRepository(context), getThemeManager())
+    fun provideThemeInteractor(application: Application) : ThemeInteractor {
+        return ThemeInteractorImpl(getThemeRepository(application), getThemeManager())
     }
 
-    fun provideSharingInteractor(context: Context) : SharingInteractor {
-        return SharingInteractorImpl(getExternalNavigator(context))
+    fun provideSharingInteractor(application: Application) : SharingInteractor {
+        return SharingInteractorImpl(getExternalNavigator(application))
     }
 
-    fun provideNavigator(context: Context) : Navigator {
-        return NavigatorImpl(context)
+    fun provideNavigator(application: Application) : Navigator {
+        return NavigatorImpl(application)
     }
 
-    private fun getTrackSearchRepository(context: Context) : TracksSearchRepository {
-        return  TracksSearchRepositoryImpl(getRetrofitItunesNetworkClient(context))
+    private fun getTrackSearchRepository(application: Application) : TracksSearchRepository {
+        return  TracksSearchRepositoryImpl(getRetrofitItunesNetworkClient(application))
     }
 
-    private fun getRetrofitItunesNetworkClient(context: Context) : NetworkClient {
-        return RetrofitItunesNetworkClient(context)
+    private fun getRetrofitItunesNetworkClient(application: Application) : NetworkClient {
+        return RetrofitItunesNetworkClient(application)
     }
 
-    private fun getSearchHistoryRepository(context : Context) : SearchHistoryRepository {
-        return SearchHistoryRepositoryImpl(context)
+    private fun getSearchHistoryRepository(application: Application) : SearchHistoryRepository {
+        return SearchHistoryRepositoryImpl(application)
     }
 
     private fun getPlayerSettingsRepository() : PlayerSettingsRepository {
         return PlayerSettingsRepositoryImpl()
     }
 
-    private fun getThemeRepository(context: Context) : ThemeRepository {
-        return ThemeRepositoryImpl(context)
+    private fun getThemeRepository(application: Application) : ThemeRepository {
+        return ThemeRepositoryImpl(application)
     }
 
     private fun getThemeManager() : ThemeManager {
         return ThemeManagerImpl()
     }
 
-    private fun getExternalNavigator(context: Context) : ExternalNavigator {
-        return ExternalNavigatorImpl(context)
+    private fun getExternalNavigator(application: Application) : ExternalNavigator {
+        return ExternalNavigatorImpl(application)
     }
 }

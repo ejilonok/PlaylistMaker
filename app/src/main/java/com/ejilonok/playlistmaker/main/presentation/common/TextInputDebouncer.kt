@@ -1,9 +1,11 @@
-package com.ejilonok.playlistmaker.main.ui.common
+package com.ejilonok.playlistmaker.main.presentation.common
 
 import android.os.Handler
 import android.os.Looper
 
-class TextInputDebouncer(val runnable : Runnable, val delay : Long) {
+class TextInputDebouncer(
+    private val runnable : Runnable,
+    private val delay : Long) {
 
     fun execute() {
         handler.removeCallbacks(runnable)

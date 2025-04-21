@@ -1,4 +1,4 @@
-package com.ejilonok.playlistmaker.search.presenatation
+package com.ejilonok.playlistmaker.search.presentation
 
 import com.ejilonok.playlistmaker.search.domain.models.Track
 

@@ -15,7 +15,7 @@ object TrackMapper {
             trackDto.releaseDate ?: "",
             trackDto.primaryGenreName ?: "",
             trackDto.country ?: "",
-            trackDto.previewUrl)
+            trackDto.previewUrl ?: "")
     }
 
     private val formatter by lazy  { SimpleDateFormat("mm:ss", Locale.getDefault()) }

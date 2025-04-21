@@ -5,22 +5,18 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.ejilonok.playlistmaker.creator.Creator
 import com.ejilonok.playlistmaker.databinding.ActivitySearchBinding
 import com.ejilonok.playlistmaker.main.ui.common.gone
+import com.ejilonok.playlistmaker.main.ui.common.setVisible
 import com.ejilonok.playlistmaker.main.ui.common.show
 import com.ejilonok.playlistmaker.search.domain.models.Track
-import com.ejilonok.playlistmaker.search.presenatation.SearchViewModel
-import com.ejilonok.playlistmaker.search.presenatation.SearchState
-import com.ejilonok.playlistmaker.search.presenatation.SearchView
-import moxy.MvpActivity
-import moxy.presenter.InjectPresenter
-import moxy.presenter.ProvidePresenter
+import com.ejilonok.playlistmaker.search.presentation.SearchViewModel
+import com.ejilonok.playlistmaker.search.presentation.SearchState
 
 
-class SearchActivity : ComponentActivity(), SearchView {
+class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
     private var textWatcher : TextWatcher? = null
     private lateinit var searchViewModel: SearchViewModel
@@ -28,9 +24,11 @@ class SearchActivity : ComponentActivity(), SearchView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+
         searchViewModel = ViewModelProvider(this,
-            SearchViewModel.getViewModelFactory(this.applicationContext))[SearchViewModel::class.java]
+            SearchViewModel.getViewModelFactory())[SearchViewModel::class.java]
+
+        setContentView(binding.root)
 
         binding.recyclerTrackList.adapter = TrackAdapter { track ->
             searchViewModel.addTrackAndStartPlayer(track)
@@ -45,12 +43,41 @@ class SearchActivity : ComponentActivity(), SearchView {
         setupUpdateButton()
 
         binding.searchBackButton.setOnClickListener { finish() }
+
+        searchViewModel.getScreenStateLiveData().observe(this) { screenState ->
+            when (screenState) {
+                is SearchState.Content -> showSearchResult(screenState.tracks)
+                is SearchState.History -> showHistory(screenState.tracks)
+                SearchState.EmptyScreen -> showEmptyScreen()
+                SearchState.Loading -> showLoading()
+                SearchState.EmptySearchResult -> showEmptySearchResult()
+                SearchState.ServerError -> showServerError()
+            }
+        }
+        searchViewModel.getCanClearSearchLine().observe(this) {canClear ->
+            binding.clearButton.setVisible(canClear)
+        }
+        searchViewModel.searchStringLiveData().observe(this) { searchLine ->
+            // это условие, чтобы не скидывалось положение курсора при вводе текста в поле
+            if (searchLine != binding.searchLine.text.toString())
+                binding.searchLine.setText(searchLine)
+        }
+
+        searchViewModel.getKeyboardVisibility().observe(this) {
+            hideKeyboard()
+        }
+
+        searchViewModel.searchLineHasFocusLiveData.observe(this) {
+            if (it) {
+                binding.searchLine.requestFocus()
+            } else {
+                binding.searchLine.clearFocus()
+            }
+        }
     }
 
     override fun onDestroy() {
         textWatcher?.let { binding.searchLine.removeTextChangedListener(it) }
-        searchViewModel.onDestroy()
-
         super.onDestroy()
     }
 
@@ -80,7 +107,7 @@ class SearchActivity : ComponentActivity(), SearchView {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                searchViewModel.searchTextChanged(s)
+                searchViewModel.onSearchStringChanged(s)
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -92,7 +119,6 @@ class SearchActivity : ComponentActivity(), SearchView {
             searchViewModel.searchFocusChangeListener(hasFocus)
         }
 
-        searchLine.requestFocus()
         searchLine.setOnEditorActionListener { _, actionId, _ ->
             searchViewModel.onSearchEditorAction(actionId)
         }
@@ -101,20 +127,6 @@ class SearchActivity : ComponentActivity(), SearchView {
     private fun setupClearButton() {
         binding.clearButton.setOnClickListener {
             searchViewModel.onClickClearButton()
-        }
-    }
-    override fun setSearchLineText(text : String) {
-        binding.searchLine.setText(text)
-    }
-
-    override fun render(state: SearchState) {
-        when (state) {
-            is SearchState.Content -> showSearchResult(state.tracks)
-            is SearchState.History -> showHistory(state.tracks)
-            SearchState.EmptyScreen -> showEmptyScreen()
-            SearchState.Loading -> showLoading()
-            SearchState.EmptySearchResult -> showEmptySearchResult()
-            SearchState.ServerError -> showServerError()
         }
     }
 
@@ -133,11 +145,11 @@ class SearchActivity : ComponentActivity(), SearchView {
     }
 
     private fun showSearchResult(tracks: List<Track>) {
-        setTrackList(tracks)
+        (binding.recyclerTrackList.adapter as TrackAdapter).setItems(tracks)
         showSearchResult()
     }
 
-    override fun showSearchResult() {
+    private fun showSearchResult() {
         hideHistory()
         hideSearchResults()
         hideProgressBar()
@@ -150,14 +162,6 @@ class SearchActivity : ComponentActivity(), SearchView {
         hideSearchResults()
         binding.serverError.show()
         binding.updateButton.show()
-    }
-
-    override fun setCanClearSearchLine(canClean: Boolean) {
-        if (canClean) {
-            binding.clearButton.show()
-        } else {
-            binding.clearButton.gone()
-        }
     }
 
     private fun showEmptySearchResult() {
@@ -182,12 +186,6 @@ class SearchActivity : ComponentActivity(), SearchView {
         binding.recyclerHistoryList.scrollToPosition(0)
     }
 
-    override fun showScreenWithoutFocus() {
-        showEmptyScreen()
-        binding.searchLine.clearFocus()
-        hideKeyboard()
-    }
-
     private fun showLoading() {
         hideSearchResults()
         hideHistory()
@@ -198,14 +196,9 @@ class SearchActivity : ComponentActivity(), SearchView {
         binding.historyGroup.gone()
     }
 
-    override fun hideKeyboard() {
+    private fun hideKeyboard() {
         val inputMethodManager =
             getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
-    }
-
-
-    private fun setTrackList(tracks: List<Track>) {
-        (binding.recyclerTrackList.adapter as TrackAdapter).setItems(tracks)
     }
 }

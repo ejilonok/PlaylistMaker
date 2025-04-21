@@ -1,13 +1,13 @@
 package com.ejilonok.playlistmaker.search.data.repository
 
-import android.content.Context
+import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import com.ejilonok.playlistmaker.search.domain.api.repository.SearchHistoryRepository
 import com.ejilonok.playlistmaker.search.domain.models.Track
 import com.google.gson.Gson
 
-class SearchHistoryRepositoryImpl(private val context: Context) : SearchHistoryRepository {
-    private val sharedPreferences by lazy { context.getSharedPreferences(
+class SearchHistoryRepositoryImpl(private val application: Application) : SearchHistoryRepository {
+    private val sharedPreferences by lazy { application.getSharedPreferences(
         SHARED_PREFERENCE_HISTORY,
         AppCompatActivity.MODE_PRIVATE
     ) }

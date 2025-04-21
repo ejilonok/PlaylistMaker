@@ -1,9 +1,10 @@
-package com.ejilonok.playlistmaker.main.ui.common
+package com.ejilonok.playlistmaker.main.presentation.common
 
 import android.os.Handler
 import android.os.Looper
 
-class ClickDebouncer(val debounceDelay : Long ) {
+class ClickDebouncer(
+    private val debounceDelay : Long ) {
     private var isClickAllowed = true
     fun can(): Boolean {
         val current = isClickAllowed
@@ -17,7 +18,7 @@ class ClickDebouncer(val debounceDelay : Long ) {
         return current
     }
 
-    fun onDestroy() {
+    fun clearCalls() {
         handler.removeCallbacksAndMessages(DEBOUNCE_TOKEN)
     }
 
