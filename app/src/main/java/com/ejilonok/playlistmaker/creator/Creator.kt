@@ -3,6 +3,9 @@ package com.ejilonok.playlistmaker.creator
 import android.app.Application
 import com.ejilonok.playlistmaker.main.data.NavigatorImpl
 import com.ejilonok.playlistmaker.main.domain.Navigator
+import com.ejilonok.playlistmaker.player.data.dto.TrackSerializerImpl
+import com.ejilonok.playlistmaker.player.data.repository.AudioPlayerManagerImpl
+import com.ejilonok.playlistmaker.player.domain.AudioPlayerManager
 import com.ejilonok.playlistmaker.settings.domain.api.interactor.ThemeInteractor
 import com.ejilonok.playlistmaker.settings.domain.api.repository.ThemeRepository
 import com.ejilonok.playlistmaker.settings.domain.api.repository.ThemeManager
@@ -19,9 +22,8 @@ import com.ejilonok.playlistmaker.search.data.repository.TracksSearchRepositoryI
 import com.ejilonok.playlistmaker.search.data.repository.SearchHistoryRepositoryImpl
 import com.ejilonok.playlistmaker.search.data.network.RetrofitItunesNetworkClient
 import com.ejilonok.playlistmaker.player.domain.api.interactor.PlayerInteractor
-import com.ejilonok.playlistmaker.player.domain.api.repository.PlayerSettingsRepository
 import com.ejilonok.playlistmaker.player.domain.impl.PlayerInteractorImpl
-import com.ejilonok.playlistmaker.player.data.repository.PlayerSettingsRepositoryImpl
+import com.ejilonok.playlistmaker.player.domain.api.mapper.TrackSerializer
 import com.ejilonok.playlistmaker.search.data.network.NetworkClient
 import com.ejilonok.playlistmaker.sharing.data.ExternalNavigatorImpl
 import com.ejilonok.playlistmaker.sharing.domain.api.interactor.SharingInteractor
@@ -38,7 +40,7 @@ object Creator {
     }
 
     fun providePlayerInteractor() : PlayerInteractor {
-        return PlayerInteractorImpl(getPlayerSettingsRepository())
+        return PlayerInteractorImpl(getAudioPlayerManager())
     }
 
     fun provideThemeInteractor(application: Application) : ThemeInteractor {
@@ -53,6 +55,10 @@ object Creator {
         return NavigatorImpl(application)
     }
 
+    fun provideTrackSerializer(): TrackSerializer {
+        return TrackSerializerImpl
+    }
+
     private fun getTrackSearchRepository(application: Application) : TracksSearchRepository {
         return  TracksSearchRepositoryImpl(getRetrofitItunesNetworkClient(application))
     }
@@ -65,10 +71,6 @@ object Creator {
         return SearchHistoryRepositoryImpl(application)
     }
 
-    private fun getPlayerSettingsRepository() : PlayerSettingsRepository {
-        return PlayerSettingsRepositoryImpl()
-    }
-
     private fun getThemeRepository(application: Application) : ThemeRepository {
         return ThemeRepositoryImpl(application)
     }
@@ -79,5 +81,9 @@ object Creator {
 
     private fun getExternalNavigator(application: Application) : ExternalNavigator {
         return ExternalNavigatorImpl(application)
+    }
+
+    private fun getAudioPlayerManager(): AudioPlayerManager {
+        return AudioPlayerManagerImpl()
     }
 }

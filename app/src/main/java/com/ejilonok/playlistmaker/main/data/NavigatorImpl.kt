@@ -3,18 +3,19 @@ package com.ejilonok.playlistmaker.main.data
 import android.app.Activity
 import android.app.Application
 import android.content.Intent
+import com.ejilonok.playlistmaker.creator.Creator
 import com.ejilonok.playlistmaker.main.domain.Navigator
 import com.ejilonok.playlistmaker.library.ui.LibraryActivity
 import com.ejilonok.playlistmaker.player.ui.PlayerActivity
 import com.ejilonok.playlistmaker.search.domain.models.Track
 import com.ejilonok.playlistmaker.search.ui.SearchActivity
 import com.ejilonok.playlistmaker.settings.ui.SettingsActivity
-import com.google.gson.Gson
 
 class NavigatorImpl(
     application: Application
 ) : Navigator {
     private val applicationContext = application.applicationContext
+    private val trackConverter = Creator.provideTrackSerializer()
     override fun gotoSearch() {
         startOtherActivity(SearchActivity::class.java)
     }
@@ -30,7 +31,7 @@ class NavigatorImpl(
     override fun gotoPlayer(track: Track) {
         val playerIntent = Intent(applicationContext, PlayerActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK  // Добавляем флаг
-            putExtra("TRACK_JSON", Gson().toJson(track))
+            putExtra("TRACK_JSON", trackConverter.toString(track))
         }
         applicationContext.startActivity(playerIntent)
     }

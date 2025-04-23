@@ -31,9 +31,7 @@ class SearchViewModel(
     private var screenState = MutableLiveData<SearchState>(SearchState.EmptyScreen)
     fun getScreenStateLiveData() : LiveData<SearchState> = screenState
     init {
-        val history = searchHistoryInteractor.load()
-        if (!searchHistoryInteractor.isHistoryEmpty())
-            screenState.postValue(SearchState.History(history))
+        searchHistoryInteractor.load()
     }
 
     private var canClearSearchLine = MutableLiveData(false)
@@ -91,7 +89,8 @@ class SearchViewModel(
 
     fun onClickClearButton() {
         searchDebounce.stop()
-        onSearchStringChanged("")
+        keyboardHide.postValue(Unit)
+        searchString.postValue("")
         searchLineHasFocus.postValue(false)
         canClearSearchLine.postValue(false)
     }
@@ -162,7 +161,6 @@ class SearchViewModel(
         startPlayer(track)
     }
 
-    // TODO: перенести работу с вызовом активити в дата слой 
     fun startPlayer(track: Track) {
         if (clickDebouncer.can()) {
             navigator.gotoPlayer(track)
