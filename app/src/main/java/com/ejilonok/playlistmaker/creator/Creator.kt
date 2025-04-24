@@ -52,7 +52,7 @@ object Creator {
     }
 
     fun provideNavigator(application: Application) : Navigator {
-        return NavigatorImpl(application)
+        return NavigatorImpl(application, provideTrackSerializer())
     }
 
     fun provideTrackSerializer(): TrackSerializer {

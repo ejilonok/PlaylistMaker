@@ -3,19 +3,19 @@ package com.ejilonok.playlistmaker.main.data
 import android.app.Activity
 import android.app.Application
 import android.content.Intent
-import com.ejilonok.playlistmaker.creator.Creator
 import com.ejilonok.playlistmaker.main.domain.Navigator
 import com.ejilonok.playlistmaker.library.ui.LibraryActivity
+import com.ejilonok.playlistmaker.player.domain.api.mapper.TrackSerializer
 import com.ejilonok.playlistmaker.player.ui.PlayerActivity
 import com.ejilonok.playlistmaker.search.domain.models.Track
 import com.ejilonok.playlistmaker.search.ui.SearchActivity
 import com.ejilonok.playlistmaker.settings.ui.SettingsActivity
 
 class NavigatorImpl(
-    application: Application
+    application: Application,
+    private val trackConverter : TrackSerializer
 ) : Navigator {
     private val applicationContext = application.applicationContext
-    private val trackConverter = Creator.provideTrackSerializer()
     override fun gotoSearch() {
         startOtherActivity(SearchActivity::class.java)
     }
