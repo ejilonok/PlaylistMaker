@@ -13,7 +13,7 @@ import com.ejilonok.playlistmaker.main.ui.common.setVisible
 import com.ejilonok.playlistmaker.main.ui.common.show
 import com.ejilonok.playlistmaker.search.domain.models.Track
 import com.ejilonok.playlistmaker.search.presentation.SearchViewModel
-import com.ejilonok.playlistmaker.search.presentation.SearchState
+import com.ejilonok.playlistmaker.search.presentation.SearchUiState
 
 
 class SearchActivity : AppCompatActivity() {
@@ -42,37 +42,31 @@ class SearchActivity : AppCompatActivity() {
         setupClearButton()
         setupUpdateButton()
 
-        binding.searchBackButton.setOnClickListener { finish() }
+        binding.searchBackButton.setOnClickListener { searchViewModel.finish() }
 
         searchViewModel.getScreenStateLiveData().observe(this) { screenState ->
-            when (screenState) {
-                is SearchState.Content -> showSearchResult(screenState.tracks)
-                is SearchState.History -> showHistory(screenState.tracks)
-                SearchState.EmptyScreen -> showEmptyScreen()
-                SearchState.Loading -> showLoading()
-                SearchState.EmptySearchResult -> showEmptySearchResult()
-                SearchState.ServerError -> showServerError()
+            when (screenState.state) {
+                SearchUiState.Finish -> finish()
+                is SearchUiState.Content -> showSearchResult(screenState.state.tracks)
+                is SearchUiState.History -> showHistory(screenState.state.tracks)
+                SearchUiState.Waiting -> showEmptyScreen()
+                SearchUiState.Loading -> showLoading()
+                SearchUiState.EmptySearchResult -> showEmptySearchResult()
+                SearchUiState.ServerError -> showServerError()
             }
-        }
-        searchViewModel.getCanClearSearchLine().observe(this) {canClear ->
-            binding.clearButton.setVisible(canClear)
-        }
-        searchViewModel.searchStringLiveData().observe(this) { searchLine ->
-            // это условие, чтобы не скидывалось положение курсора при вводе текста в поле
-            if (searchLine != binding.searchLine.text.toString())
-                binding.searchLine.setText(searchLine)
-        }
 
-        searchViewModel.getKeyboardVisibility().observe(this) {
-            hideKeyboard()
-        }
+            binding.clearButton.setVisible(screenState.common.canClearSearch)
 
-        searchViewModel.searchLineHasFocusLiveData.observe(this) {
-            if (it) {
+            if (binding.searchLine.text.toString() != screenState.common.searchText)
+                binding.searchLine.setText( screenState.common.searchText )
+
+            if (!screenState.common.showKeyboard)
+                hideKeyboard()
+
+            if (screenState.common.hasFocus)
                 binding.searchLine.requestFocus()
-            } else {
+            else
                 binding.searchLine.clearFocus()
-            }
         }
     }
 
@@ -116,7 +110,7 @@ class SearchActivity : AppCompatActivity() {
 
         searchLine.addTextChangedListener(textWatcher)
         searchLine.setOnFocusChangeListener { _, hasFocus ->
-            searchViewModel.searchFocusChangeListener(hasFocus)
+            searchViewModel.setHasFocus(hasFocus)
         }
 
         searchLine.setOnEditorActionListener { _, actionId, _ ->

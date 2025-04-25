@@ -12,7 +12,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.ejilonok.playlistmaker.creator.Creator
 import com.ejilonok.playlistmaker.main.domain.consumer.ConsumerData
 import com.ejilonok.playlistmaker.main.presentation.common.ClickDebouncer
-import com.ejilonok.playlistmaker.main.presentation.common.SingleLiveEvent
 import com.ejilonok.playlistmaker.main.presentation.common.TextInputDebouncer
 import com.ejilonok.playlistmaker.search.domain.api.interactor.SearchHistoryInteractor
 import com.ejilonok.playlistmaker.search.domain.models.Track
@@ -28,60 +27,61 @@ class SearchViewModel(
     private val searchDebounce = TextInputDebouncer({ startSearchTracks() }, SEARCH_DEBOUNCE_DELAY )
     private var lastSearchResult = listOf<Track>()
 
-    private var screenState = MutableLiveData<SearchState>(SearchState.EmptyScreen)
-    fun getScreenStateLiveData() : LiveData<SearchState> = screenState
-    init {
-        searchHistoryInteractor.load()
+    private var screenState = MutableLiveData(SearchScreenState(CommonState(), SearchUiState.Waiting))
+    fun getScreenStateLiveData() : LiveData<SearchScreenState> = screenState
+    private fun getSearchText() : String = screenState.value?.common?.searchText ?: ""
+    fun setHasFocus(hasFocus: Boolean) {
+        if (hasFocus) {
+            postState(getCommonState().copy( hasFocus = true , showKeyboard = true ), needShowHistory())
+        } else {
+            postState(getCommonState().copy( hasFocus = false ), SearchUiState.Waiting)
+        }
     }
 
-    private var canClearSearchLine = MutableLiveData(false)
-    fun getCanClearSearchLine() : LiveData<Boolean> = canClearSearchLine
-
-    private var searchString = MutableLiveData("")
-    fun searchStringLiveData() : LiveData<String> = searchString
     fun onSearchStringChanged(s : CharSequence?) {
         val text = s?.toString() ?: ""
-        if (searchString.value != text) {
-            searchString.postValue(text)
-            canClearSearchLine.postValue(text.isNotEmpty())
-            if (text.isEmpty()) {
-                showHistory()
-                searchDebounce.stop()
-            } else {
-                screenState.postValue(SearchState.EmptyScreen)
-                searchDebounce.execute()
+        screenState.value?.let { state ->
+            if (state.common.searchText != text) {
+                if (text.isEmpty()) {
+                    postState(state.common.copy(searchText = text, canClearSearch = text.isNotEmpty()), needShowHistory())
+                    searchDebounce.stop()
+                } else {
+                    postState(getCommonState().copy(searchText = text, canClearSearch = text.isNotEmpty()), SearchUiState.Waiting)
+                    searchDebounce.execute()
+                }
             }
         }
     }
 
-    private var searchLineHasFocus = MutableLiveData(false)
-    var searchLineHasFocusLiveData : LiveData<Boolean> = searchLineHasFocus
-    fun searchFocusChangeListener(hasFocus : Boolean) {
-        if (hasFocus) {
-            showHistory()
-        } else {
-            renderState(SearchState.EmptyScreen)
-        }
-        if (hasFocus != searchLineHasFocus.value) {
-            searchLineHasFocus.postValue(hasFocus)
-        }
+    private fun getCommonState() : CommonState {
+        return screenState.value?.common ?: CommonState()
+    }
+    private fun postState(common : CommonState, state : SearchUiState) {
+        screenState.postValue(
+            screenState.value?.copy(
+                common = common,
+                state = state
+            ) ?: SearchScreenState(common, state))
+    }
+    private fun postState(stateUi : SearchUiState) {
+        postState(common = getCommonState().copy(), state = stateUi)
+    }
+    private fun postState(common : CommonState) {
+        postState(common, screenState.value?.state ?: SearchUiState.Waiting)
     }
 
-    private var keyboardHide = SingleLiveEvent(Unit)
-    fun getKeyboardVisibility() : LiveData<Unit> = keyboardHide
+    fun finish() {
+        postState(SearchUiState.Finish)
+    }
 
     override fun onCleared() {
         clickDebouncer.clearCalls()
         searchDebounce.onDestroy()
     }
 
-    private fun renderState(state: SearchState) {
-        screenState.postValue(state)
-    }
-
     fun onSearchEditorAction(actionId : Int) : Boolean {
         return if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
-            keyboardHide.postValue(Unit)
+            postState(getCommonState().copy(showKeyboard = false))
             true
         }
         else false
@@ -89,10 +89,9 @@ class SearchViewModel(
 
     fun onClickClearButton() {
         searchDebounce.stop()
-        keyboardHide.postValue(Unit)
-        searchString.postValue("")
-        searchLineHasFocus.postValue(false)
-        canClearSearchLine.postValue(false)
+        // data класс осуществляет вызов observer's только в случае изменения значений,
+        // поэтому можно вызвать конструктор класса - observer отработает только для измененных полей.
+        postState(CommonState(), SearchUiState.Waiting)
     }
 
     fun updateSearch() {
@@ -100,31 +99,31 @@ class SearchViewModel(
         startSearchTracks()
     }
 
-    private fun showHistory() {
+    private fun needShowHistory() : SearchUiState {
         val history = searchHistoryInteractor.load()
-        if (history.isEmpty()) {
-            renderState(SearchState.EmptyScreen)
-        } else {
-            renderState(SearchState.History(history))
-        }
+
+        return if (history.isNotEmpty()) SearchUiState.History(history) else SearchUiState.Waiting
     }
 
     private fun startSearchTracks() {
         if (!tracksInteractor.isNetworkConnected()) {
-            renderState(SearchState.ServerError)
+            postState(SearchUiState.ServerError)
             return
         }
 
-        if ((lastSearchText == searchString.value) && (lastSearchResult.isNotEmpty())) {
-            renderState(SearchState.Content(lastSearchResult))
+        if ((lastSearchText == getSearchText()) && (lastSearchResult.isNotEmpty())) {
+            postState(SearchUiState.Content(lastSearchResult))
             return
         }
 
-        renderState(SearchState.Loading)
+        postState(SearchUiState.Loading)
 
-        tracksInteractor.searchTracks(searchString.value ?: "") { data -> getSearchResults(data) }
-
-        lastSearchText = searchString.value ?: ""
+        // Далее мы оформляем запрос на поиск в интерактор.
+        // Сохраняем значение строки, чтобы сохранить по какому тексту выполнился последний запрос.
+        // Даже если из другого потока изменится текст это не вызовет ошибку логики показа результатов последнего поиска
+        val searchText = getSearchText()
+        tracksInteractor.searchTracks(searchText) { data -> getSearchResults(data) }
+        lastSearchText = searchText
     }
 
     private fun getSearchResults(data: ConsumerData<List<Track>>) {
@@ -132,14 +131,14 @@ class SearchViewModel(
             is ConsumerData.Data -> {
                 lastSearchResult = data.data
                 if (data.data.isEmpty()) {
-                    renderState(SearchState.EmptySearchResult)
+                    postState(SearchUiState.EmptySearchResult)
                 } else {
-                    renderState(SearchState.Content(data.data))
+                    postState(SearchUiState.Content(data.data))
                 }
             }
 
             is ConsumerData.Error -> {
-                renderState(SearchState.ServerError)
+                postState(SearchUiState.ServerError)
             }
         }
     }
@@ -153,7 +152,7 @@ class SearchViewModel(
 
     fun clearHistory() {
         searchHistoryInteractor.clear()
-        showHistory()
+        postState(needShowHistory())
     }
 
     fun addTrackAndStartPlayer(track: Track) {
