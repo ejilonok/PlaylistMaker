@@ -20,7 +20,6 @@
     <string name="no_tracks">Ничего не нашлось</string>
     <string name="server_error">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
     <string name="update">Обновить</string>
-    <string name="api_exception">Ошибка открытия сервиса. Попробуйте перезапустить приложение</string>
     <string name="history_title">Вы искали</string>
     <string name="history_clear">Очистить историю</string>
     <string name="track_time">Длительность</string>
@@ -28,7 +27,5 @@
     <string name="year">Год</string>
     <string name="genre">Жанр</string>
     <string name="country">Страна</string>
-    <string name="internal_error">Непредвиденный сбой приложения. Попробуйте перезапустить приложение</string>
     <string name="default_preview_time" translatable="false">00:00</string>
-    <string name="empty_track">Ошибка загрузки информации о треке</string>
 </resources>

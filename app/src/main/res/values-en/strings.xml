@@ -13,7 +13,6 @@
     <string name="no_tracks">Nothing was found</string>
     <string name="server_error">Communication problems\\n\\nThe download failed. Check your internet connection</string>
     <string name="update">Update</string>
-    <string name="api_exception">API connection exception. Try to restart application</string>
     <string name="history_title">You\'re looking for</string>
     <string name="history_clear">Clear history</string>
     <string name="track_time">Track time</string>
@@ -21,6 +20,4 @@
     <string name="genre">Genre</string>
     <string name="country">Country</string>
     <string name="year">Year</string>
-    <string name="internal_error">Some internal error. Try to restart application</string>
-    <string name="empty_track">Track load exception</string>
 </resources>
