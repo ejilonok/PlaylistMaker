@@ -16,18 +16,7 @@ object TrackSerializerImpl : TrackSerializer {
         return try {
             gson.fromJson(string, Track::class.java)
         } catch (e : Exception) {
-            Track(
-                trackId = -1, // Уникальный идентификатор композиции, primary key.
-                trackName = "Empty", // Название композиции
-                artistName = "Empty", // Имя исполнителя
-                trackTime = "0:00", // Продолжительность трека
-                artworkUrl100 = "", // Ссылка на изображение обложки
-                collectionName = "", // Название альбома
-                releaseDate = "----", // Год релиза трека
-                primaryGenreName = "", // Жанр трека
-                country  = "", // Страна исполнителя
-                previewUrl = "" // Ссылка на аудио-превью композиции
-            )
+            TrackSerializer.EMPTY_TRACK
         }
     }
 }

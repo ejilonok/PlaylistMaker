@@ -13,6 +13,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.ejilonok.playlistmaker.R
 import com.ejilonok.playlistmaker.creator.Creator
 import com.ejilonok.playlistmaker.main.presentation.common.ClickDebouncer
+import com.ejilonok.playlistmaker.player.domain.api.mapper.TrackSerializer
 import com.ejilonok.playlistmaker.search.domain.models.Track
 
 
@@ -27,7 +28,7 @@ class PlayerViewModel(
     private val clickDebouncer = ClickDebouncer(CLICK_DEBOUNCE_DELAY)
 
     private val playerState = MutableLiveData<PlayerState>(PlayerState.ShowContentNotReady(
-        EMPTY_TRACK))
+        TrackSerializer.EMPTY_TRACK))
     val playerStateLiveData : LiveData<PlayerState> = playerState
 
     private val startTimeString = application.getString(R.string.default_preview_time)
@@ -47,7 +48,7 @@ class PlayerViewModel(
             }
             playerInteractor.init(track.previewUrl)
         } ?: {
-            playerState.postValue(PlayerState.ShowContentNotReady(EMPTY_TRACK))
+            playerState.postValue(PlayerState.ShowContentNotReady(TrackSerializer.EMPTY_TRACK))
         }
     }
 
@@ -97,18 +98,5 @@ class PlayerViewModel(
                     PlayerViewModel(this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application)
                 }
             }
-
-        private val EMPTY_TRACK = Track (
-            0,
-            "",
-            "",
-            "",
-            "",
-            "",
-            "----",
-            "",
-            "",
-            ""
-        )
     }
 }
