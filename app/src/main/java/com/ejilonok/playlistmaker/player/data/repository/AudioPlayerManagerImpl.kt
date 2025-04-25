@@ -6,18 +6,29 @@ import com.ejilonok.playlistmaker.player.domain.AudioPlayerManager
 
 class AudioPlayerManagerImpl : AudioPlayerManager {
     private val mediaPlayer = MediaPlayer()
+    private var notPrepared = true
+
     override fun load(source : String) {
-        mediaPlayer.setDataSource(source)
-        mediaPlayer.prepareAsync()
+        mediaPlayer.apply {
+            setDataSource(source)
+            notPrepared = true
+            prepareAsync()
+        }
     }
 
     override fun release() {
-        mediaPlayer.stop()
+        mediaPlayer.setOnCompletionListener(null)
+        mediaPlayer.setOnPreparedListener(null)
+
+        if (mediaPlayer.isPlaying || notPrepared)
+            mediaPlayer.stop()
+
         mediaPlayer.release()
     }
     override fun setOnPreparedListener(onPreparedListener: SimpleConsumer) {
         mediaPlayer.setOnPreparedListener {
             onPreparedListener.consume()
+            notPrepared = true
         }
     }
 

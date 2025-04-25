@@ -35,29 +35,27 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         binding.playButton.setOnClickListener { playerViewModel.changeState() }
-        binding.playerBackButton.setOnClickListener { finish() }
-    }
-
-    override fun onPause() {
-        playerViewModel.pause()
-        super.onPause()
+        binding.playerBackButton.setOnClickListener { playerViewModel.finish() }
     }
 
     private fun renderState(state : PlayerState) {
         when (state) {
-            is PlayerState.ShowContentNotReady -> {
+            is PlayerState.Content.ShowContentNotReady -> {
                 bindTrack(state.track)
                 setPlayButtonEnabled(false)
             }
-            is PlayerState.ShowContentPause -> {
+            is PlayerState.Content.ShowContentPause -> {
+                bindTrack(state.track)
                 setPlayButton()
                 setPlayButtonEnabled(true)
             }
-            is PlayerState.ShowContentPlaying -> {
+            is PlayerState.Content.ShowContentPlaying -> {
+                bindTrack(state.track)
                 setPauseButton()
                 setPlayButtonEnabled(true)
             }
             is PlayerState.Finish -> finish()
+            is PlayerState.NoTrack -> {}
         }
     }
 

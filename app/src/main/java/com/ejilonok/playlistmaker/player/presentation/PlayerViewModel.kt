@@ -20,39 +20,66 @@ import com.ejilonok.playlistmaker.search.domain.models.Track
 class PlayerViewModel(
     application: Application
 ) : AndroidViewModel(application) {
-    private var track : Track? = null
     private val trackSerializer = Creator.provideTrackSerializer()
     private val playerInteractor = Creator.providePlayerInteractor()
     private val handler = Handler(Looper.getMainLooper())
     private val playerRunnable = Runnable { updateTime() }
     private val clickDebouncer = ClickDebouncer(CLICK_DEBOUNCE_DELAY)
 
-    private val playerState = MutableLiveData<PlayerState>(PlayerState.ShowContentNotReady(
-        TrackSerializer.EMPTY_TRACK))
+    private val playerState = MutableLiveData<PlayerState>(PlayerState.NoTrack)
     val playerStateLiveData : LiveData<PlayerState> = playerState
+
+    private fun getActualTrack() : Track {
+        return if (playerState.value is PlayerState.Content)
+            (playerState.value as PlayerState.Content).track
+        else TrackSerializer.EMPTY_TRACK
+    }
 
     private val startTimeString = application.getString(R.string.default_preview_time)
     private val currentTime = MutableLiveData(startTimeString)
     val currentTimeLiveData : LiveData<String> = currentTime
 
     fun onCreate(intent: Intent) {
-        track = trackSerializer.fromString(intent.getStringExtra("TRACK_JSON") ?: "")
-        track?.let {track ->
-            playerState.postValue(PlayerState.ShowContentNotReady(track))
-            playerInteractor.setOnCompletionListener {
-                currentTime.postValue(startTimeString)
-                playerState.postValue(PlayerState.ShowContentPause)
+        setTrack(intent)
+    }
+
+    private fun setTrack(intent: Intent) {
+        val trackFromIntent = trackSerializer.fromString(intent.getStringExtra("TRACK_JSON") ?: "")
+        when (playerState.value) {
+            is PlayerState.Content -> {
+                val actualTrack = getActualTrack()
+                if (trackFromIntent != actualTrack) {
+                    stopASync()
+
+                    loadTrack(trackFromIntent)
+                }
+
             }
-            playerInteractor.setOnPreparedListener {
-                playerState.postValue(PlayerState.ShowContentPause)
-            }
-            playerInteractor.init(track.previewUrl)
-        } ?: {
-            playerState.postValue(PlayerState.ShowContentNotReady(TrackSerializer.EMPTY_TRACK))
+            is PlayerState.NoTrack -> loadTrack(trackFromIntent)
+            else -> {}
         }
     }
 
+    private fun loadTrack(track : Track) {
+        playerState.postValue(PlayerState.Content.ShowContentNotReady(track))
+        playerInteractor.setOnCompletionListener {
+            currentTime.postValue(startTimeString)
+            playerState.postValue(PlayerState.Content.ShowContentPause(track))
+        }
+        playerInteractor.setOnPreparedListener {
+            playerState.postValue(PlayerState.Content.ShowContentPause(track))
+        }
+        playerInteractor.init(track.previewUrl)
+    }
+
+    fun finish() {
+        playerState.postValue(PlayerState.Finish)
+    }
     override fun onCleared() {
+        stopASync()
+    }
+
+    private fun stopASync() {
         clickDebouncer.clearCalls()
         handler.removeCallbacks(playerRunnable)
         playerInteractor.release()
@@ -61,23 +88,22 @@ class PlayerViewModel(
     fun changeState() {
         if (clickDebouncer.can()) {
             when (playerInteractor.isPlaying()) {
-                true -> {
-                    playerInteractor.pause()
-                    playerState.postValue(PlayerState.ShowContentPause)
-                }
-
-                else -> {
-                    playerInteractor.play()
-                    playerState.postValue(PlayerState.ShowContentPlaying)
-                }
+                true -> pause()
+                else -> play()
             }
             updateTime()
         }
     }
 
-    fun pause() {
+    private fun pause() {
         if (playerInteractor.pause()) {
-            playerState.postValue(PlayerState.ShowContentPause)
+            playerState.postValue(PlayerState.Content.ShowContentPause(getActualTrack()))
+        }
+    }
+
+    private fun play() {
+        if (playerInteractor.play()) {
+            playerState.postValue(PlayerState.Content.ShowContentPlaying(getActualTrack()))
         }
     }
 
