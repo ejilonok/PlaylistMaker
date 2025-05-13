@@ -1,72 +1,89 @@
 package com.ejilonok.playlistmaker.creator
 
-import android.content.Context
-import com.ejilonok.playlistmaker.domain.api.interactors.ThemeInteractor
-import com.ejilonok.playlistmaker.domain.impl.ThemeInteractorImpl
-import com.ejilonok.playlistmaker.domain.api.repository.ThemeRepository
-import com.ejilonok.playlistmaker.data.repository.ThemeRepositoryImpl
-import com.ejilonok.playlistmaker.data.repository.TracksSearchRepositoryImpl
-import com.ejilonok.playlistmaker.data.network.RetrofitItunesNetworkClient
-import com.ejilonok.playlistmaker.data.repository.PlayerSettingsRepositoryImpl
-import com.ejilonok.playlistmaker.data.repository.SearchHistoryRepositoryImpl
-import com.ejilonok.playlistmaker.data.repository.SearchSettingsRepositoryImpl
-import com.ejilonok.playlistmaker.data.repository.ThemeManagerImpl
-import com.ejilonok.playlistmaker.domain.api.interactors.PlayerInteractor
-import com.ejilonok.playlistmaker.domain.api.interactors.SearchHistoryInteractor
-import com.ejilonok.playlistmaker.domain.api.interactors.SearchSettingsInteractor
-import com.ejilonok.playlistmaker.domain.api.interactors.TrackInteractor
-import com.ejilonok.playlistmaker.domain.api.repository.PlayerSettingsRepository
-import com.ejilonok.playlistmaker.domain.api.repository.SearchHistoryRepository
-import com.ejilonok.playlistmaker.domain.api.repository.SearchSettingsRepository
-import com.ejilonok.playlistmaker.domain.api.repository.ThemeManager
-import com.ejilonok.playlistmaker.domain.api.repository.TracksSearchRepository
-import com.ejilonok.playlistmaker.domain.impl.SearchHistoryInteractorImpl
-import com.ejilonok.playlistmaker.domain.impl.TrackInteractorImpl
-import com.ejilonok.playlistmaker.domain.impl.PlayerInteractorImpl
-import com.ejilonok.playlistmaker.domain.impl.SearchSettingsInteractorImpl
+import android.app.Application
+import com.ejilonok.playlistmaker.main.data.NavigatorImpl
+import com.ejilonok.playlistmaker.main.domain.Navigator
+import com.ejilonok.playlistmaker.player.data.dto.TrackSerializerImpl
+import com.ejilonok.playlistmaker.player.data.repository.AudioPlayerManagerImpl
+import com.ejilonok.playlistmaker.player.domain.AudioPlayerManager
+import com.ejilonok.playlistmaker.settings.domain.api.interactor.ThemeInteractor
+import com.ejilonok.playlistmaker.settings.domain.api.repository.ThemeRepository
+import com.ejilonok.playlistmaker.settings.domain.api.repository.ThemeManager
+import com.ejilonok.playlistmaker.settings.domain.impl.ThemeInteractorImpl
+import com.ejilonok.playlistmaker.settings.data.repository.ThemeRepositoryImpl
+import com.ejilonok.playlistmaker.settings.data.repository.ThemeManagerImpl
+import com.ejilonok.playlistmaker.search.domain.api.interactor.SearchHistoryInteractor
+import com.ejilonok.playlistmaker.search.domain.api.interactor.TrackInteractor
+import com.ejilonok.playlistmaker.search.domain.api.repository.SearchHistoryRepository
+import com.ejilonok.playlistmaker.search.domain.api.repository.TracksSearchRepository
+import com.ejilonok.playlistmaker.search.domain.impl.SearchHistoryInteractorImpl
+import com.ejilonok.playlistmaker.search.domain.impl.TrackInteractorImpl
+import com.ejilonok.playlistmaker.search.data.repository.TracksSearchRepositoryImpl
+import com.ejilonok.playlistmaker.search.data.repository.SearchHistoryRepositoryImpl
+import com.ejilonok.playlistmaker.search.data.network.RetrofitItunesNetworkClient
+import com.ejilonok.playlistmaker.player.domain.api.interactor.PlayerInteractor
+import com.ejilonok.playlistmaker.player.domain.impl.PlayerInteractorImpl
+import com.ejilonok.playlistmaker.player.domain.api.mapper.TrackSerializer
+import com.ejilonok.playlistmaker.search.data.network.NetworkClient
+import com.ejilonok.playlistmaker.sharing.data.ExternalNavigatorImpl
+import com.ejilonok.playlistmaker.sharing.domain.api.interactor.SharingInteractor
+import com.ejilonok.playlistmaker.sharing.domain.api.repository.ExternalNavigator
+import com.ejilonok.playlistmaker.sharing.domain.impl.SharingInteractorImpl
 
 object Creator {
-    fun provideTracksInteractor() : TrackInteractor {
-        return TrackInteractorImpl(getTrackSearchRepository())
+    fun provideTracksInteractor(application: Application) : TrackInteractor {
+        return TrackInteractorImpl(getTrackSearchRepository(application))
     }
 
-    fun provideSearchHistoryInteractor(context : Context) : SearchHistoryInteractor {
-        return SearchHistoryInteractorImpl( getSearchHistoryRepository(context) )
+    fun provideSearchHistoryInteractor(application: Application) : SearchHistoryInteractor {
+        return SearchHistoryInteractorImpl( getSearchHistoryRepository(application) )
     }
 
     fun providePlayerInteractor() : PlayerInteractor {
-        return PlayerInteractorImpl(getPlayerSettingsRepository())
+        return PlayerInteractorImpl(getAudioPlayerManager())
     }
 
-    fun provideThemeInteractor(context: Context) : ThemeInteractor {
-        return ThemeInteractorImpl(getThemeRepository(context), getThemeManager())
+    fun provideThemeInteractor(application: Application) : ThemeInteractor {
+        return ThemeInteractorImpl(getThemeRepository(application), getThemeManager())
     }
 
-    fun provideSearchSettingsInteractor() : SearchSettingsInteractor {
-        return SearchSettingsInteractorImpl(getSearchSettingsRepository())
+    fun provideSharingInteractor(application: Application) : SharingInteractor {
+        return SharingInteractorImpl(getExternalNavigator(application))
     }
 
-    private fun getTrackSearchRepository() : TracksSearchRepository {
-        return  TracksSearchRepositoryImpl(RetrofitItunesNetworkClient)
+    fun provideNavigator(application: Application) : Navigator {
+        return NavigatorImpl(application, provideTrackSerializer())
     }
 
-    private fun getSearchHistoryRepository(context : Context) : SearchHistoryRepository {
-        return SearchHistoryRepositoryImpl(context)
+    fun provideTrackSerializer(): TrackSerializer {
+        return TrackSerializerImpl
     }
 
-    private fun getPlayerSettingsRepository() : PlayerSettingsRepository {
-        return PlayerSettingsRepositoryImpl()
+    private fun getTrackSearchRepository(application: Application) : TracksSearchRepository {
+        return  TracksSearchRepositoryImpl(getRetrofitItunesNetworkClient(application))
     }
 
-    private fun getThemeRepository(context: Context) : ThemeRepository {
-        return ThemeRepositoryImpl(context)
+    private fun getRetrofitItunesNetworkClient(application: Application) : NetworkClient {
+        return RetrofitItunesNetworkClient(application)
+    }
+
+    private fun getSearchHistoryRepository(application: Application) : SearchHistoryRepository {
+        return SearchHistoryRepositoryImpl(application)
+    }
+
+    private fun getThemeRepository(application: Application) : ThemeRepository {
+        return ThemeRepositoryImpl(application)
     }
 
     private fun getThemeManager() : ThemeManager {
         return ThemeManagerImpl()
     }
 
-    private fun getSearchSettingsRepository() : SearchSettingsRepository {
-        return SearchSettingsRepositoryImpl()
+    private fun getExternalNavigator(application: Application) : ExternalNavigator {
+        return ExternalNavigatorImpl(application)
+    }
+
+    private fun getAudioPlayerManager(): AudioPlayerManager {
+        return AudioPlayerManagerImpl()
     }
 }
