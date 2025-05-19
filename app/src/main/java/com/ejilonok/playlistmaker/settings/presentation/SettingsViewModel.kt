@@ -1,20 +1,18 @@
 package com.ejilonok.playlistmaker.settings.presentation
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.ejilonok.playlistmaker.creator.Creator
+import androidx.lifecycle.ViewModel
 import com.ejilonok.playlistmaker.main.presentation.common.ClickDebouncer
 import com.ejilonok.playlistmaker.main.presentation.common.SingleLiveEvent
+import com.ejilonok.playlistmaker.settings.domain.api.interactor.ThemeInteractor
+import com.ejilonok.playlistmaker.sharing.domain.api.interactor.SharingInteractor
 
 class SettingsViewModel(
-    application: Application
-) : AndroidViewModel(application) {
-    private val clickDebouncer = ClickDebouncer(CLICK_DEBOUNCE_DELAY)
+    private val themeInteractor : ThemeInteractor,
+    private val sharingInteractor : SharingInteractor,
+    private val clickDebouncer : ClickDebouncer
+) : ViewModel() {
 
     private val actualThemeIsDark = MutableLiveData(false)
     val actualThemeIsDarkLiveData : LiveData<Boolean> = actualThemeIsDark
@@ -22,9 +20,6 @@ class SettingsViewModel(
         actualThemeIsDark.postValue(isDark)
         themeInteractor.setDarkTheme(isDark)
     }
-
-    private var themeInteractor = Creator.provideThemeInteractor(getApplication())
-    private var sharingInteractor = Creator.provideSharingInteractor(getApplication())
 
     init {
         setThemeDark(themeInteractor.isSavedThemeDark())
@@ -48,12 +43,6 @@ class SettingsViewModel(
         super.onCleared()
     }
     companion object {
-        private const val CLICK_DEBOUNCE_DELAY = 600L
-        fun getViewModelFactory(): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    SettingsViewModel(this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application)
-                }
-            }
+        const val CLICK_DEBOUNCE_DELAY = 600L
     }
 }

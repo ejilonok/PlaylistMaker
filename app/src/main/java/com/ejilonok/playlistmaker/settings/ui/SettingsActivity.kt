@@ -2,23 +2,20 @@ package com.ejilonok.playlistmaker.settings.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.ejilonok.playlistmaker.databinding.ActivitySettingsBinding
 import com.ejilonok.playlistmaker.settings.presentation.SettingsActions
 import com.ejilonok.playlistmaker.settings.presentation.SettingsViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding : ActivitySettingsBinding
-    private lateinit var settingsModel : SettingsViewModel
+    private val settingsModel : SettingsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
-
-        settingsModel = ViewModelProvider(this,
-            SettingsViewModel.getViewModelFactory())[SettingsViewModel::class.java]
 
         settingsModel.actualThemeIsDarkLiveData.observe(this) {
             binding.themeSwitch.isChecked = it ?: false

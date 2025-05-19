@@ -4,8 +4,10 @@ import com.ejilonok.playlistmaker.player.domain.api.mapper.TrackSerializer
 import com.ejilonok.playlistmaker.search.domain.models.Track
 import com.google.gson.Gson
 
-object TrackSerializerImpl : TrackSerializer {
-    private val gson = Gson()
+class TrackSerializerImpl(
+    private val gson : Gson
+) : TrackSerializer {
+
     fun Track.map() : String {
         return gson.toJson(this)
     }

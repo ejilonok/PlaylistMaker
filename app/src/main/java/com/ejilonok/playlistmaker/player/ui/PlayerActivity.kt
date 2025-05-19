@@ -2,7 +2,6 @@ package com.ejilonok.playlistmaker.player.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.ejilonok.playlistmaker.R
@@ -13,10 +12,11 @@ import com.ejilonok.playlistmaker.main.ui.common.show
 import com.ejilonok.playlistmaker.player.presentation.PlayerState
 import com.ejilonok.playlistmaker.player.presentation.PlayerViewModel
 import com.ejilonok.playlistmaker.search.domain.models.Track
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding : ActivityPlayerBinding
-    private lateinit var playerViewModel: PlayerViewModel
+    private val playerViewModel: PlayerViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,8 +24,6 @@ class PlayerActivity : AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        playerViewModel = ViewModelProvider(this,
-            PlayerViewModel.getViewModelFactory())[PlayerViewModel::class.java]
         playerViewModel.onCreate(intent)
         playerViewModel.playerStateLiveData.observe(this) {state ->
             renderState(state)

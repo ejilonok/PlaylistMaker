@@ -4,8 +4,9 @@ import android.media.MediaPlayer
 import com.ejilonok.playlistmaker.main.domain.consumer.SimpleConsumer
 import com.ejilonok.playlistmaker.player.domain.AudioPlayerManager
 
-class AudioPlayerManagerImpl : AudioPlayerManager {
-    private val mediaPlayer = MediaPlayer()
+class AudioPlayerManagerImpl(
+    private val mediaPlayer : MediaPlayer
+) : AudioPlayerManager {
     private var notPrepared = true
 
     override fun load(source : String) {
@@ -22,8 +23,6 @@ class AudioPlayerManagerImpl : AudioPlayerManager {
 
         if (mediaPlayer.isPlaying || notPrepared)
             mediaPlayer.stop()
-
-        mediaPlayer.release()
     }
     override fun setOnPreparedListener(onPreparedListener: SimpleConsumer) {
         mediaPlayer.setOnPreparedListener {
