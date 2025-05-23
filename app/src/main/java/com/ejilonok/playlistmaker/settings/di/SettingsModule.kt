@@ -25,15 +25,15 @@ val settingsModule = module {
         ConfigurationProviderImpl(androidContext())
     }
 
-    single<ThemeRepository> {
+    factory<ThemeRepository> {
         ThemeRepositoryImpl(get(), get())
     }
 
-    single<ThemeManager> {
+    factory<ThemeManager> {
         ThemeManagerImpl()
     }
 
-    single<ThemeInteractor> {
+    factory<ThemeInteractor> {
         ThemeInteractorImpl(get(), get())
     }
 
