@@ -11,9 +11,6 @@ import retrofit2.Retrofit
 class RetrofitItunesNetworkClient(
     private val context: Context,
     retrofit : Retrofit ) : NetworkClient {
-    companion object {
-        const val itunesBaseUrl = "https://itunes.apple.com/"
-    }
 
     private val itunesService = retrofit.create(TrackITunesApiService::class.java)
 
@@ -44,5 +41,9 @@ class RetrofitItunesNetworkClient(
             }
         }
         return false
+    }
+
+    companion object {
+        const val itunesBaseUrl = "https://itunes.apple.com/"
     }
 }
