@@ -1,30 +1,27 @@
 package com.ejilonok.playlistmaker.player.presentation
 
-import android.app.Application
 import android.content.Intent
 import android.os.Handler
-import android.os.Looper
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.lifecycle.ViewModel
 import com.ejilonok.playlistmaker.R
-import com.ejilonok.playlistmaker.creator.Creator
+import com.ejilonok.playlistmaker.main.domain.ResourceProvider
 import com.ejilonok.playlistmaker.main.presentation.common.ClickDebouncer
+import com.ejilonok.playlistmaker.player.domain.api.interactor.PlayerInteractor
 import com.ejilonok.playlistmaker.player.domain.api.mapper.TrackSerializer
 import com.ejilonok.playlistmaker.search.domain.models.Track
 
 
 class PlayerViewModel(
-    application: Application
-) : AndroidViewModel(application) {
-    private val trackSerializer = Creator.provideTrackSerializer()
-    private val playerInteractor = Creator.providePlayerInteractor()
-    private val handler = Handler(Looper.getMainLooper())
+    resourceProvider: ResourceProvider,
+    private val trackSerializer : TrackSerializer,
+    private val playerInteractor : PlayerInteractor,
+    private val mainHandler : Handler,
+    private val clickDebouncer : ClickDebouncer
+) : ViewModel() {
+
     private val playerRunnable = Runnable { updateTime() }
-    private val clickDebouncer = ClickDebouncer(CLICK_DEBOUNCE_DELAY)
 
     private val playerState = MutableLiveData<PlayerState>(PlayerState.NoTrack)
     val playerStateLiveData : LiveData<PlayerState> = playerState
@@ -35,7 +32,7 @@ class PlayerViewModel(
         else TrackSerializer.EMPTY_TRACK
     }
 
-    private val startTimeString = application.getString(R.string.default_preview_time)
+    private val startTimeString = resourceProvider.getString(R.string.default_preview_time)
     private val currentTime = MutableLiveData(startTimeString)
     val currentTimeLiveData : LiveData<String> = currentTime
 
@@ -81,7 +78,7 @@ class PlayerViewModel(
 
     private fun stopASync() {
         clickDebouncer.clearCalls()
-        handler.removeCallbacks(playerRunnable)
+        mainHandler.removeCallbacks(playerRunnable)
         playerInteractor.release()
     }
 
@@ -109,20 +106,14 @@ class PlayerViewModel(
 
     private fun updateTime() {
         if (playerInteractor.isPlaying()) {
-            handler.postDelayed(playerRunnable, DELAY_UPDATE)
+            mainHandler.postDelayed(playerRunnable, DELAY_UPDATE)
         }
 
         currentTime.postValue(playerInteractor.getCurrentTimeString())
     }
 
     companion object {
-        private const val CLICK_DEBOUNCE_DELAY = 600L
-        private const val DELAY_UPDATE = 350L
-        fun getViewModelFactory(): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    PlayerViewModel(this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application)
-                }
-            }
+        const val CLICK_DEBOUNCE_DELAY = 600L
+        const val DELAY_UPDATE = 350L
     }
 }

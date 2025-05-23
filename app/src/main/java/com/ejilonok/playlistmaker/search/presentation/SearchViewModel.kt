@@ -1,33 +1,31 @@
 package com.ejilonok.playlistmaker.search.presentation
 
-import android.app.Application
 import android.view.inputmethod.EditorInfo
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.ejilonok.playlistmaker.creator.Creator
+import androidx.lifecycle.ViewModel
+import com.ejilonok.playlistmaker.main.domain.Navigator
 import com.ejilonok.playlistmaker.main.domain.consumer.ConsumerData
 import com.ejilonok.playlistmaker.main.presentation.common.ClickDebouncer
 import com.ejilonok.playlistmaker.main.presentation.common.TextInputDebouncer
 import com.ejilonok.playlistmaker.search.domain.api.interactor.SearchHistoryInteractor
+import com.ejilonok.playlistmaker.search.domain.api.interactor.TrackInteractor
 import com.ejilonok.playlistmaker.search.domain.models.Track
 
 class SearchViewModel(
-    application: Application
-)  : AndroidViewModel(application) {
-    private val tracksInteractor = Creator.provideTracksInteractor(getApplication())
-    private val searchHistoryInteractor = Creator.provideSearchHistoryInteractor(getApplication())
-    private val navigator = Creator.provideNavigator(getApplication())
-    private var lastSearchText: String = ""
-    private val clickDebouncer = ClickDebouncer(CLICK_DEBOUNCE_DELAY)
-    private val searchDebounce = TextInputDebouncer({ startSearchTracks() }, SEARCH_DEBOUNCE_DELAY )
+    private val tracksInteractor : TrackInteractor,
+    private val searchHistoryInteractor : SearchHistoryInteractor,
+    private val navigator : Navigator,
+    private val clickDebouncer : ClickDebouncer,
+    private val searchDebounce: TextInputDebouncer
+)  : ViewModel() {
     private var lastSearchResult = listOf<Track>()
+    private var lastSearchText: String = ""
 
     private var screenState = MutableLiveData(SearchScreenState(CommonState(), SearchUiState.Waiting))
+    init {
+        searchDebounce.runnable = Runnable(this::startSearchTracks)
+    }
     fun getScreenStateLiveData() : LiveData<SearchScreenState> = screenState
     private fun getSearchText() : String = screenState.value?.common?.searchText ?: ""
     fun setHasFocus(hasFocus: Boolean) {
@@ -166,13 +164,7 @@ class SearchViewModel(
         }
     }
     companion object {
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private const val CLICK_DEBOUNCE_DELAY = 600L
-        fun getViewModelFactory(): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    SearchViewModel(this[APPLICATION_KEY] as Application)
-                }
-            }
+        const val SEARCH_DEBOUNCE_DELAY = 2000L
+        const val CLICK_DEBOUNCE_DELAY = 600L
     }
 }

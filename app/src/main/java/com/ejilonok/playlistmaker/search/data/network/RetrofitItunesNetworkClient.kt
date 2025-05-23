@@ -1,6 +1,5 @@
 package com.ejilonok.playlistmaker.search.data.network
 
-import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -8,18 +7,10 @@ import com.ejilonok.playlistmaker.search.data.dto.Response
 import com.ejilonok.playlistmaker.search.data.dto.TracksSearchRequest
 import com.ejilonok.playlistmaker.search.domain.models.ResponseCode
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
-class RetrofitItunesNetworkClient( private val application: Application ) : NetworkClient {
-
-    companion object {
-        private const val itunesBaseUrl = "https://itunes.apple.com/"
-    }
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(itunesBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+class RetrofitItunesNetworkClient(
+    private val context: Context,
+    retrofit : Retrofit ) : NetworkClient {
 
     private val itunesService = retrofit.create(TrackITunesApiService::class.java)
 
@@ -39,7 +30,7 @@ class RetrofitItunesNetworkClient( private val application: Application ) : Netw
     }
 
     override fun isConnected(): Boolean {
-        val connectivityManager = application.getSystemService(
+        val connectivityManager = context.applicationContext.getSystemService(
             Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
         if (capabilities != null) {
@@ -50,5 +41,9 @@ class RetrofitItunesNetworkClient( private val application: Application ) : Netw
             }
         }
         return false
+    }
+
+    companion object {
+        const val itunesBaseUrl = "https://itunes.apple.com/"
     }
 }

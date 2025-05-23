@@ -1,26 +1,29 @@
 package com.ejilonok.playlistmaker.main.presentation.common
 
 import android.os.Handler
-import android.os.Looper
 
 class TextInputDebouncer(
-    private val runnable : Runnable,
+    private val mainHandler : Handler,
     private val delay : Long) {
 
+    var runnable : Runnable? = null
+        set(value) {
+            stop()
+            field = value
+        }
+
     fun execute() {
-        handler.removeCallbacks(runnable)
-        handler.postDelayed(runnable, delay)
+        runnable?.let {
+            mainHandler.removeCallbacks(it)
+            mainHandler.postDelayed(it, delay)
+        }
     }
 
     fun stop() {
-        handler.removeCallbacks(runnable)
+        runnable?.let { mainHandler.removeCallbacks(it) }
     }
 
     fun onDestroy() {
         stop()
-    }
-
-    companion object {
-        private val handler = Handler(Looper.getMainLooper())
     }
 }

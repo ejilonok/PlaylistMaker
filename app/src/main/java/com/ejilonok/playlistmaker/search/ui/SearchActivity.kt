@@ -6,27 +6,22 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.ejilonok.playlistmaker.databinding.ActivitySearchBinding
-import com.ejilonok.playlistmaker.main.ui.common.gone
-import com.ejilonok.playlistmaker.main.ui.common.setVisible
-import com.ejilonok.playlistmaker.main.ui.common.show
+import com.ejilonok.playlistmaker.main.ui.common.*
 import com.ejilonok.playlistmaker.search.domain.models.Track
 import com.ejilonok.playlistmaker.search.presentation.SearchViewModel
 import com.ejilonok.playlistmaker.search.presentation.SearchUiState
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
     private var textWatcher : TextWatcher? = null
-    private lateinit var searchViewModel: SearchViewModel
+    private val searchViewModel: SearchViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
-
-        searchViewModel = ViewModelProvider(this,
-            SearchViewModel.getViewModelFactory())[SearchViewModel::class.java]
 
         setContentView(binding.root)
 

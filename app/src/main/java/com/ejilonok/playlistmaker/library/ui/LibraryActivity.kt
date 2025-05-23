@@ -2,20 +2,17 @@ package com.ejilonok.playlistmaker.library.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.ejilonok.playlistmaker.databinding.ActivityLibraryBinding
 import com.ejilonok.playlistmaker.library.presentation.LibraryViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LibraryActivity : AppCompatActivity() {
     private lateinit var binding : ActivityLibraryBinding
-    private lateinit var libraryModel : LibraryViewModel
+    private val libraryModel : LibraryViewModel by viewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLibraryBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        libraryModel = ViewModelProvider(this,
-            LibraryViewModel.getViewModelFactory())[LibraryViewModel::class.java]
 
         libraryModel.closeActivityEventLiveData.observe(this) {
             finish()
@@ -24,9 +21,5 @@ class LibraryActivity : AppCompatActivity() {
         binding.libraryBackButton.setOnClickListener {
             libraryModel.onBackClicked()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 }
