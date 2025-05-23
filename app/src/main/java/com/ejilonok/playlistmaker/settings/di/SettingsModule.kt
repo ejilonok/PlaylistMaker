@@ -13,11 +13,12 @@ import com.ejilonok.playlistmaker.settings.presentation.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val settingsModule = module {
 
-    single {
+    single(named(ThemeRepositoryImpl.SHARED_PREFERENCES_NAME)) {
         androidContext().getSharedPreferences(ThemeRepositoryImpl.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
     }
 
@@ -26,7 +27,7 @@ val settingsModule = module {
     }
 
     factory<ThemeRepository> {
-        ThemeRepositoryImpl(get(), get())
+        ThemeRepositoryImpl(get(), get(named(ThemeRepositoryImpl.SHARED_PREFERENCES_NAME)))
     }
 
     factory<ThemeManager> {

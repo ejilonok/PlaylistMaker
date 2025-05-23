@@ -40,14 +40,14 @@ val searchModule = module {
         TrackInteractorImpl(get())
     }
 
-    single(named("search_history_prefs")) {
+    single(named(SearchHistoryRepositoryImpl.SHARED_PREFERENCE_HISTORY)) {
         androidContext().getSharedPreferences(
             SearchHistoryRepositoryImpl.SHARED_PREFERENCE_HISTORY,
             AppCompatActivity.MODE_PRIVATE)
     }
 
     factory<SearchHistoryRepository> {
-        SearchHistoryRepositoryImpl(get(named("search_history_prefs")), get())
+        SearchHistoryRepositoryImpl(get(named(SearchHistoryRepositoryImpl.SHARED_PREFERENCE_HISTORY)), get())
     }
 
     factory<SearchHistoryInteractor> {
