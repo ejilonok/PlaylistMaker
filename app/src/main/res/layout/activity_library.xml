@@ -17,7 +17,18 @@
                 <TextView
                     style="@style/OtherSecondaryTitle"
                     android:text="@string/library"/>
-
         </LinearLayout>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TabLayoutStyle"/>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            style="@style/ViewPagerStyle"/>
 
 </LinearLayout>

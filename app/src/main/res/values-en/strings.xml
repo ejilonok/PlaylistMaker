@@ -20,4 +20,9 @@
     <string name="genre">Genre</string>
     <string name="country">Country</string>
     <string name="year">Year</string>
+    <string name="empty_library">Your library is rmpty</string>
+    <string name="empty_playlist_list">No playlists created yet</string>
+    <string name="new_playlist">New playlist</string>
+    <string name="favorite_tracks">Favorite tracks</string>
+    <string name="playlists">Playlists</string>
 </resources>
