@@ -69,7 +69,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/TrackErrorStyle"
-        android:drawableTop="@drawable/empty_track_list"
+        android:drawableTop="@drawable/error_smile"
         android:text="@string/no_tracks"
          />
     <TextView
@@ -85,7 +85,7 @@
         android:id="@+id/update_button"
         android:layout_width="wrap_content"
         android:layout_height="36dp"
-        style="@style/UpdateButton"
+        style="@style/ButtonOnSecondary"
         android:text="@string/update"
         android:visibility="gone"/>
 
@@ -115,7 +115,7 @@
             android:id="@+id/clear_history_button"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
-            style="@style/UpdateButton"
+            style="@style/ButtonOnSecondary"
             android:layout_marginTop="24dp"
             android:text="@string/history_clear"/>
     </LinearLayout>
