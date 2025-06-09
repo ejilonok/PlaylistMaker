@@ -53,9 +53,6 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
                 SearchUiState.Loading -> showLoading()
                 SearchUiState.EmptySearchResult -> showEmptySearchResult()
                 SearchUiState.ServerError -> showServerError()
-                is SearchUiState.GoToPlayer -> findNavController().navigate(
-                    R.id.action_searchFragment_to_playerFragment,
-                    PlayerFragment.createArgs(screenState.state.track))
             }
 
             binding.clearButton.setVisible(screenState.common.canClearSearch)
@@ -71,10 +68,18 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             else
                 binding.searchLine.clearFocus()
         }
+
+        searchViewModel.gotoPlayerLiveData().observe(viewLifecycleOwner) {track ->
+            findNavController().navigate(
+                R.id.action_searchFragment_to_playerFragment,
+                PlayerFragment.createArgs(track))
+        }
     }
 
     override fun onDestroyView() {
         textWatcher?.let { binding.searchLine.removeTextChangedListener(it) }
+        searchViewModel.getScreenStateLiveData().removeObservers(viewLifecycleOwner)
+        searchViewModel.gotoPlayerLiveData().removeObservers(viewLifecycleOwner)
         super.onDestroyView()
     }
 

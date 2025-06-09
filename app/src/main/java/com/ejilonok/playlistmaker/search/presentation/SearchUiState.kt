@@ -15,7 +15,6 @@ sealed class SearchUiState {
     data object Loading : SearchUiState()
     data object ServerError : SearchUiState()
     data object EmptySearchResult : SearchUiState()
-    data class GoToPlayer(val track : Track) : SearchUiState()
 }
 
 data class SearchScreenState (
