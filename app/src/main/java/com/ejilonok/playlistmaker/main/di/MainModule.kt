@@ -6,7 +6,6 @@ import com.ejilonok.playlistmaker.main.data.ResourceProviderImpl
 import com.ejilonok.playlistmaker.main.domain.ResourceProvider
 import com.ejilonok.playlistmaker.main.presentation.MainViewModel
 import com.ejilonok.playlistmaker.main.presentation.common.ClickDebouncer
-import com.ejilonok.playlistmaker.main.presentation.common.SingleLiveEvent
 import com.ejilonok.playlistmaker.main.presentation.common.TextInputDebouncer
 import com.google.gson.Gson
 import org.koin.android.ext.koin.androidContext
@@ -24,10 +23,6 @@ val mainModule = module {
 
     single<ResourceProvider> {
         ResourceProviderImpl(androidContext())
-    }
-
-    factory<SingleLiveEvent<Unit>> {
-        SingleLiveEvent(Unit)
     }
 
     factory {
