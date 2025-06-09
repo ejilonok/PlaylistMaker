@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ejilonok.playlistmaker.main.presentation.common.ClickDebouncer
-import com.ejilonok.playlistmaker.main.presentation.common.SingleLiveEvent
 import com.ejilonok.playlistmaker.settings.domain.api.interactor.ThemeInteractor
 import com.ejilonok.playlistmaker.sharing.domain.api.interactor.SharingInteractor
 
@@ -27,16 +26,12 @@ class SettingsViewModel(
     fun onAction(action : SettingsActions) {
         if (clickDebouncer.can()) {
             when (action) {
-                is SettingsActions.BackButtonClicked -> closeActivityEvent.postValue(Unit)
                 is SettingsActions.ShareAppClicked -> sharingInteractor.shareApp()
                 is SettingsActions.SupportClicked -> sharingInteractor.openSupport()
                 is SettingsActions.TermsOfUseClicked -> sharingInteractor.openTerms()
             }
         }
     }
-
-    private val closeActivityEvent = SingleLiveEvent(Unit)
-    val closeActivityEventLiveData : LiveData<Unit> = closeActivityEvent
 
     override fun onCleared() {
         clickDebouncer.clearCalls()

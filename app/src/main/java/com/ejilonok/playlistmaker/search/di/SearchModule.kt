@@ -55,8 +55,7 @@ val searchModule = module {
     }
 
     viewModel {
-        SearchViewModel(get(),get(),get(),
-            get { parametersOf(SearchViewModel.CLICK_DEBOUNCE_DELAY) },
+        SearchViewModel(get(), get(), get { parametersOf(SearchViewModel.CLICK_DEBOUNCE_DELAY) },
             get { parametersOf(SearchViewModel.SEARCH_DEBOUNCE_DELAY) })
     }
 }

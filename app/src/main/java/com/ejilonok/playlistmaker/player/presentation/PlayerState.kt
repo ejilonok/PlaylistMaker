@@ -9,5 +9,4 @@ sealed interface PlayerState {
         data class ShowContentPlaying(override val track: Track) : Content(track)
         data class ShowContentPause(override val track: Track) : Content(track)
     }
-    data object Finish : PlayerState
 }

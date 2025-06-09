@@ -1,6 +1,5 @@
 package com.ejilonok.playlistmaker.player.presentation
 
-import android.content.Intent
 import android.os.Handler
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -36,12 +35,12 @@ class PlayerViewModel(
     private val currentTime = MutableLiveData(startTimeString)
     val currentTimeLiveData : LiveData<String> = currentTime
 
-    fun onCreate(intent: Intent) {
-        setTrack(intent)
+    fun onCreate(params : String) {
+        setTrack(params)
     }
 
-    private fun setTrack(intent: Intent) {
-        val trackFromIntent = trackSerializer.fromString(intent.getStringExtra("TRACK_JSON") ?: "")
+    private fun setTrack(params : String) {
+        val trackFromIntent = trackSerializer.fromString(params)
         when (playerState.value) {
             is PlayerState.Content -> {
                 val actualTrack = getActualTrack()
@@ -69,9 +68,6 @@ class PlayerViewModel(
         playerInteractor.init(track.previewUrl)
     }
 
-    fun finish() {
-        playerState.postValue(PlayerState.Finish)
-    }
     override fun onCleared() {
         stopASync()
     }

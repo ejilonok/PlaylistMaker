@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/SecondaryLayout"
     android:paddingTop="@dimen/main_padding"
-    android:paddingEnd="0dp">
+    android:paddingEnd="0dp"
+    tools:context=".player.ui.PlayerFragment">
 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"

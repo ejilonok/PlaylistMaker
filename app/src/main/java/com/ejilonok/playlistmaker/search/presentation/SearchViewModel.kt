@@ -1,22 +1,22 @@
 package com.ejilonok.playlistmaker.search.presentation
 
+import android.util.Log
 import android.view.inputmethod.EditorInfo
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.ejilonok.playlistmaker.main.domain.Navigator
 import com.ejilonok.playlistmaker.main.domain.consumer.ConsumerData
 import com.ejilonok.playlistmaker.main.presentation.common.ClickDebouncer
+import com.ejilonok.playlistmaker.main.presentation.common.SingleLiveEvent
 import com.ejilonok.playlistmaker.main.presentation.common.TextInputDebouncer
 import com.ejilonok.playlistmaker.search.domain.api.interactor.SearchHistoryInteractor
 import com.ejilonok.playlistmaker.search.domain.api.interactor.TrackInteractor
 import com.ejilonok.playlistmaker.search.domain.models.Track
 
 class SearchViewModel(
-    private val tracksInteractor : TrackInteractor,
-    private val searchHistoryInteractor : SearchHistoryInteractor,
-    private val navigator : Navigator,
-    private val clickDebouncer : ClickDebouncer,
+    private val tracksInteractor: TrackInteractor,
+    private val searchHistoryInteractor: SearchHistoryInteractor,
+    private val clickDebouncer: ClickDebouncer,
     private val searchDebounce: TextInputDebouncer
 )  : ViewModel() {
     private var lastSearchResult = listOf<Track>()
@@ -27,12 +27,14 @@ class SearchViewModel(
         searchDebounce.runnable = Runnable(this::startSearchTracks)
     }
     fun getScreenStateLiveData() : LiveData<SearchScreenState> = screenState
+
+    private var gotoPlayerAction : SingleLiveEvent<Track> = SingleLiveEvent(null)
+
+    fun gotoPlayerLiveData() : LiveData<Track> = gotoPlayerAction
     private fun getSearchText() : String = screenState.value?.common?.searchText ?: ""
     fun setHasFocus(hasFocus: Boolean) {
-        if (hasFocus) {
+        if (hasFocus && (screenState.value?.common?.searchText?.isEmpty() != false)) {
             postState(getCommonState().copy( hasFocus = true , showKeyboard = true ), needShowHistory())
-        } else {
-            postState(getCommonState().copy( hasFocus = false ), SearchUiState.Waiting)
         }
     }
 
@@ -55,6 +57,7 @@ class SearchViewModel(
         return screenState.value?.common ?: CommonState()
     }
     private fun postState(common : CommonState, state : SearchUiState) {
+        Log.d("postState", "$common - $state")
         screenState.postValue(
             screenState.value?.copy(
                 common = common,
@@ -68,10 +71,6 @@ class SearchViewModel(
         postState(common, screenState.value?.state ?: SearchUiState.Waiting)
     }
 
-    fun finish() {
-        postState(SearchUiState.Finish)
-    }
-
     override fun onCleared() {
         clickDebouncer.clearCalls()
         searchDebounce.onDestroy()
@@ -79,7 +78,8 @@ class SearchViewModel(
 
     fun onSearchEditorAction(actionId : Int) : Boolean {
         return if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
-            postState(getCommonState().copy(showKeyboard = false))
+            postState(getCommonState().copy(showKeyboard = false, hasFocus = false))
+            updateSearch()
             true
         }
         else false
@@ -94,6 +94,7 @@ class SearchViewModel(
 
     fun updateSearch() {
         lastSearchText = ""
+        searchDebounce.stop()
         startSearchTracks()
     }
 
@@ -160,7 +161,7 @@ class SearchViewModel(
 
     fun startPlayer(track: Track) {
         if (clickDebouncer.can()) {
-            navigator.gotoPlayer(track)
+            gotoPlayerAction.postValue(track)
         }
     }
     companion object {
