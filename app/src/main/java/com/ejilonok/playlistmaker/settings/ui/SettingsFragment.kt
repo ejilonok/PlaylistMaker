@@ -1,27 +1,30 @@
 package com.ejilonok.playlistmaker.settings.ui
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.ejilonok.playlistmaker.databinding.ActivitySettingsBinding
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.ejilonok.playlistmaker.databinding.FragmentSettingsBinding
+import com.ejilonok.playlistmaker.main.ui.common.BindingFragment
 import com.ejilonok.playlistmaker.settings.presentation.SettingsActions
 import com.ejilonok.playlistmaker.settings.presentation.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SettingsActivity : AppCompatActivity() {
-    private lateinit var binding : ActivitySettingsBinding
+class SettingsFragment : BindingFragment<FragmentSettingsBinding>() {
     private val settingsModel : SettingsViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
+    override fun createBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentSettingsBinding {
+        return FragmentSettingsBinding.inflate(inflater, container, false)
+    }
 
-        setContentView(binding.root)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        settingsModel.actualThemeIsDarkLiveData.observe(this) {
+        settingsModel.actualThemeIsDarkLiveData.observe(viewLifecycleOwner) {
             binding.themeSwitch.isChecked = it ?: false
-        }
-        settingsModel.closeActivityEventLiveData.observe(this) {
-            finish()
         }
 
         binding.themeSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -31,6 +34,5 @@ class SettingsActivity : AppCompatActivity() {
         binding.shareButton.setOnClickListener { settingsModel.onAction(SettingsActions.ShareAppClicked) }
         binding.supportButton.setOnClickListener { settingsModel.onAction(SettingsActions.SupportClicked) }
         binding.termsOfUseButton.setOnClickListener { settingsModel.onAction(SettingsActions.TermsOfUseClicked) }
-        binding.settingsBackButton.setOnClickListener { settingsModel.onAction(SettingsActions.BackButtonClicked) }
     }
 }

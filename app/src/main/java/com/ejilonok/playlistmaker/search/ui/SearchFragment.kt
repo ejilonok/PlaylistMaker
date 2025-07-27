@@ -4,26 +4,34 @@ import android.app.Activity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
-import com.ejilonok.playlistmaker.databinding.ActivitySearchBinding
+import androidx.navigation.fragment.findNavController
+import com.ejilonok.playlistmaker.R
+import com.ejilonok.playlistmaker.databinding.FragmentSearchBinding
 import com.ejilonok.playlistmaker.main.ui.common.*
+import com.ejilonok.playlistmaker.player.ui.PlayerFragment
 import com.ejilonok.playlistmaker.search.domain.models.Track
 import com.ejilonok.playlistmaker.search.presentation.SearchViewModel
 import com.ejilonok.playlistmaker.search.presentation.SearchUiState
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class SearchActivity : AppCompatActivity() {
-    private lateinit var binding: ActivitySearchBinding
+class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     private var textWatcher : TextWatcher? = null
     private val searchViewModel: SearchViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySearchBinding.inflate(layoutInflater)
+    override fun createBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentSearchBinding {
+        return FragmentSearchBinding.inflate(inflater, container, false)
+    }
 
-        setContentView(binding.root)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.recyclerTrackList.adapter = TrackAdapter { track ->
             searchViewModel.addTrackAndStartPlayer(track)
@@ -37,11 +45,8 @@ class SearchActivity : AppCompatActivity() {
         setupClearButton()
         setupUpdateButton()
 
-        binding.searchBackButton.setOnClickListener { searchViewModel.finish() }
-
-        searchViewModel.getScreenStateLiveData().observe(this) { screenState ->
+        searchViewModel.getScreenStateLiveData().observe(viewLifecycleOwner) { screenState ->
             when (screenState.state) {
-                SearchUiState.Finish -> finish()
                 is SearchUiState.Content -> showSearchResult(screenState.state.tracks)
                 is SearchUiState.History -> showHistory(screenState.state.tracks)
                 SearchUiState.Waiting -> showEmptyScreen()
@@ -63,11 +68,19 @@ class SearchActivity : AppCompatActivity() {
             else
                 binding.searchLine.clearFocus()
         }
+
+        searchViewModel.gotoPlayerLiveData().observe(viewLifecycleOwner) {track ->
+            findNavController().navigate(
+                R.id.action_searchFragment_to_playerFragment,
+                PlayerFragment.createArgs(track))
+        }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         textWatcher?.let { binding.searchLine.removeTextChangedListener(it) }
-        super.onDestroy()
+        searchViewModel.getScreenStateLiveData().removeObservers(viewLifecycleOwner)
+        searchViewModel.gotoPlayerLiveData().removeObservers(viewLifecycleOwner)
+        super.onDestroyView()
     }
 
     private fun setupUpdateButton() {
@@ -186,8 +199,9 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hideKeyboard() {
+        val activity = requireActivity()
         val inputMethodManager =
-            getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+            activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(activity.currentFocus?.windowToken, 0)
     }
 }

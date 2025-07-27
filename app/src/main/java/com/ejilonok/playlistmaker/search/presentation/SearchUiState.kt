@@ -15,14 +15,9 @@ sealed class SearchUiState {
     data object Loading : SearchUiState()
     data object ServerError : SearchUiState()
     data object EmptySearchResult : SearchUiState()
-    data object Finish : SearchUiState()
 }
 
 data class SearchScreenState (
     val common : CommonState,
     val state : SearchUiState
-) //{
-//    companion object {
-//        object Empty : SearchScreenState(common = CommonState(), state = SearchUiState.Waiting)
-//    }
-//}
+)
