@@ -52,7 +52,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
             binding.currentTimeTv.text = it
         }
 
-        binding.playButton.setOnClickListener { playerViewModel.changeState() }
+        binding.playButton.setOnClickListener { playerViewModel.changeStateDebounce() }
         binding.playerBackButton.setOnClickListener { findNavController().navigateUp() }
     }
 
