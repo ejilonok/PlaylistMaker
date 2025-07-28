@@ -28,6 +28,6 @@ val playerModule = module {
     }
 
     viewModel<PlayerViewModel> {
-        PlayerViewModel( get(), get(), get(), get(), get { parametersOf(PlayerViewModel.CLICK_DEBOUNCE_DELAY) })
+        PlayerViewModel( get(), get(), get(), get { parametersOf(PlayerViewModel.CLICK_DEBOUNCE_DELAY) })
     }
 }
