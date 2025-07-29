@@ -116,6 +116,6 @@ class PlayerViewModel(
 
     companion object {
         const val CLICK_DEBOUNCE_DELAY = 150L
-        const val DELAY_UPDATE = 350L
+        const val DELAY_UPDATE = 300L
     }
 }
