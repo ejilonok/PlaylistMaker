@@ -34,10 +34,10 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.recyclerTrackList.adapter = TrackAdapter { track ->
-            searchViewModel.addTrackAndStartPlayer(track)
+            searchViewModel.historyClickDebouncer(track)
         }
         binding.recyclerHistoryList.adapter = TrackAdapter {track ->
-            searchViewModel.startPlayer(track)
+            searchViewModel.trackClickDebounce(track)
         }
 
         setupClearHistoryButton()

@@ -14,7 +14,6 @@ import com.ejilonok.playlistmaker.search.domain.impl.TrackInteractorImpl
 import com.ejilonok.playlistmaker.search.presentation.SearchViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -55,7 +54,6 @@ val searchModule = module {
     }
 
     viewModel {
-        SearchViewModel(get(), get(), get { parametersOf(SearchViewModel.CLICK_DEBOUNCE_DELAY) },
-            get { parametersOf(SearchViewModel.SEARCH_DEBOUNCE_DELAY) })
+        SearchViewModel(get(), get())
     }
 }

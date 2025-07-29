@@ -31,8 +31,8 @@ class SettingsFragment : BindingFragment<FragmentSettingsBinding>() {
             settingsModel.setThemeDark(isChecked)
         }
 
-        binding.shareButton.setOnClickListener { settingsModel.onAction(SettingsActions.ShareAppClicked) }
-        binding.supportButton.setOnClickListener { settingsModel.onAction(SettingsActions.SupportClicked) }
-        binding.termsOfUseButton.setOnClickListener { settingsModel.onAction(SettingsActions.TermsOfUseClicked) }
+        binding.shareButton.setOnClickListener { settingsModel.actionDebounce(SettingsActions.ShareAppClicked) }
+        binding.supportButton.setOnClickListener { settingsModel.actionDebounce(SettingsActions.SupportClicked) }
+        binding.termsOfUseButton.setOnClickListener { settingsModel.actionDebounce(SettingsActions.TermsOfUseClicked) }
     }
 }

@@ -5,26 +5,38 @@ import android.view.inputmethod.EditorInfo
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ejilonok.playlistmaker.main.domain.consumer.ConsumerData
-import com.ejilonok.playlistmaker.main.presentation.common.ClickDebouncer
 import com.ejilonok.playlistmaker.main.presentation.common.SingleLiveEvent
-import com.ejilonok.playlistmaker.main.presentation.common.TextInputDebouncer
+import com.ejilonok.playlistmaker.main.presentation.common.debounce
 import com.ejilonok.playlistmaker.search.domain.api.interactor.SearchHistoryInteractor
 import com.ejilonok.playlistmaker.search.domain.api.interactor.TrackInteractor
 import com.ejilonok.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val tracksInteractor: TrackInteractor,
-    private val searchHistoryInteractor: SearchHistoryInteractor,
-    private val clickDebouncer: ClickDebouncer,
-    private val searchDebounce: TextInputDebouncer
+    private val searchHistoryInteractor: SearchHistoryInteractor
 )  : ViewModel() {
+    private var searchDebounce: Job? = null
+
+    val trackClickDebounce: (Track) -> Unit
+    val historyClickDebouncer: (Track) -> Unit
+
     private var lastSearchResult = listOf<Track>()
     private var lastSearchText: String = ""
 
     private var screenState = MutableLiveData(SearchScreenState(CommonState(), SearchUiState.Waiting))
     init {
-        searchDebounce.runnable = Runnable(this::startSearchTracks)
+        trackClickDebounce = debounce(CLICK_DEBOUNCE_DELAY, viewModelScope, false) {track ->
+            startPlayer(track)
+        }
+
+        historyClickDebouncer = debounce(CLICK_DEBOUNCE_DELAY, viewModelScope, false) {track ->
+            addTrackAndStartPlayer(track)
+        }
     }
     fun getScreenStateLiveData() : LiveData<SearchScreenState> = screenState
 
@@ -44,10 +56,13 @@ class SearchViewModel(
             if (state.common.searchText != text) {
                 if (text.isEmpty()) {
                     postState(state.common.copy(searchText = text, canClearSearch = text.isNotEmpty()), needShowHistory())
-                    searchDebounce.stop()
+                    searchDebounce?.cancel()
                 } else {
                     postState(getCommonState().copy(searchText = text, canClearSearch = text.isNotEmpty()), SearchUiState.Waiting)
-                    searchDebounce.execute()
+                    searchDebounce = viewModelScope.launch {
+                        delay(SEARCH_DEBOUNCE_DELAY)
+                        startSearchTracks()
+                    }
                 }
             }
         }
@@ -71,11 +86,6 @@ class SearchViewModel(
         postState(common, screenState.value?.state ?: SearchUiState.Waiting)
     }
 
-    override fun onCleared() {
-        clickDebouncer.clearCalls()
-        searchDebounce.onDestroy()
-    }
-
     fun onSearchEditorAction(actionId : Int) : Boolean {
         return if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
             postState(getCommonState().copy(showKeyboard = false, hasFocus = false))
@@ -86,7 +96,7 @@ class SearchViewModel(
     }
 
     fun onClickClearButton() {
-        searchDebounce.stop()
+        searchDebounce?.cancel()
         // data класс осуществляет вызов observer's только в случае изменения значений,
         // поэтому можно вызвать конструктор класса - observer отработает только для измененных полей.
         postState(CommonState(), SearchUiState.Waiting)
@@ -94,8 +104,11 @@ class SearchViewModel(
 
     fun updateSearch() {
         lastSearchText = ""
-        searchDebounce.stop()
-        startSearchTracks()
+        searchDebounce?.cancel()
+        searchDebounce = viewModelScope.launch {
+            // в случае обновления отправляем задачу поиска композиций на немедленное исполнение
+            startSearchTracks()
+        }
     }
 
     private fun needShowHistory() : SearchUiState {
@@ -154,18 +167,16 @@ class SearchViewModel(
         postState(needShowHistory())
     }
 
-    fun addTrackAndStartPlayer(track: Track) {
+    private fun addTrackAndStartPlayer(track: Track) {
         addTrackToHistory(track)
         startPlayer(track)
     }
 
-    fun startPlayer(track: Track) {
-        if (clickDebouncer.can()) {
-            gotoPlayerAction.postValue(track)
-        }
+    private fun startPlayer(track: Track) {
+        gotoPlayerAction.postValue(track)
     }
     companion object {
         const val SEARCH_DEBOUNCE_DELAY = 2000L
-        const val CLICK_DEBOUNCE_DELAY = 600L
+        const val CLICK_DEBOUNCE_DELAY = 150L
     }
 }
