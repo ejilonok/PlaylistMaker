@@ -7,18 +7,21 @@ import com.ejilonok.playlistmaker.search.data.dto.TracksSearchResponse
 import com.ejilonok.playlistmaker.search.domain.api.repository.TracksSearchRepository
 import com.ejilonok.playlistmaker.search.domain.models.Resource
 import com.ejilonok.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class TracksSearchRepositoryImpl(
     private val networkClient: NetworkClient ) : TracksSearchRepository {
-    override fun searchTracks(expression: String): Resource<List<Track>> {
+    override fun searchTracks(expression: String): Flow<Resource<List<Track>>> =  flow {
         if (!networkClient.isConnected()) {
-            return Resource.Error ( Resource.ResourceErrorCodes.NETWORK_DISCONNECTED.code )
+            emit(Resource.Error ( Resource.ResourceErrorCodes.NETWORK_DISCONNECTED.code ))
         }
         val response = networkClient.doRequest(TracksSearchRequest(expression))
-        return if (response.resultCode == 200) {
-            Resource.Success (( response as TracksSearchResponse).results.map { TrackMapper.map(it) } )
+        if (response.resultCode == 200) {
+            val data = ( response as TracksSearchResponse).results.map { TrackMapper.map(it) }
+            emit( Resource.Success (data))
         } else {
-            Resource.Error ( Resource.ResourceErrorCodes.NETWORK_ERROR.code )
+            emit( Resource.Error ( Resource.ResourceErrorCodes.NETWORK_ERROR.code ))
         }
     }
 

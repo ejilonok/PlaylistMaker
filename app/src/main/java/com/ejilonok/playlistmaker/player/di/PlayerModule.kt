@@ -9,7 +9,6 @@ import com.ejilonok.playlistmaker.player.domain.api.mapper.TrackSerializer
 import com.ejilonok.playlistmaker.player.domain.impl.PlayerInteractorImpl
 import com.ejilonok.playlistmaker.player.presentation.PlayerViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 val playerModule = module {
@@ -28,6 +27,6 @@ val playerModule = module {
     }
 
     viewModel<PlayerViewModel> {
-        PlayerViewModel( get(), get(), get(), get(), get { parametersOf(PlayerViewModel.CLICK_DEBOUNCE_DELAY) })
+        PlayerViewModel( get(), get(), get() )
     }
 }

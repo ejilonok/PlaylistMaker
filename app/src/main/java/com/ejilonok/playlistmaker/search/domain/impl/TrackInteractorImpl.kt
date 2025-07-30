@@ -5,16 +5,17 @@ import com.ejilonok.playlistmaker.search.domain.api.interactor.TrackInteractor
 import com.ejilonok.playlistmaker.search.domain.api.repository.TracksSearchRepository
 import com.ejilonok.playlistmaker.search.domain.models.Resource
 import com.ejilonok.playlistmaker.search.domain.models.ResponseCode
-import java.util.concurrent.Executors
+import com.ejilonok.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class TrackInteractorImpl(private val repository : TracksSearchRepository) : TrackInteractor {
 
-    private val executor = Executors.newCachedThreadPool()
-    override fun searchTracks(expression: String, consumer: TrackInteractor.TracksConsumer) {
-        executor.execute {
-            when (val result = repository.searchTracks(getPreparedSearchString(expression))) {
-                is Resource.Success -> consumer.consume( ConsumerData.Data(result.data) )
-                is Resource.Error -> consumer.consume( ConsumerData.Error(ResponseCode.NO_ANSWER.code) )
+    override fun searchTracks(expression: String) : Flow<ConsumerData<List<Track>>> {
+        return repository.searchTracks(getPreparedSearchString(expression)).map { result ->
+            when (result) {
+                is Resource.Success -> ConsumerData.Data(result.data)
+                is Resource.Error -> ConsumerData.Error(ResponseCode.NO_ANSWER.code)
             }
         }
     }

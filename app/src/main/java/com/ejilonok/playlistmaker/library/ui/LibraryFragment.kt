@@ -10,7 +10,7 @@ import com.ejilonok.playlistmaker.main.ui.common.BindingFragment
 import com.google.android.material.tabs.TabLayoutMediator
 
 class LibraryFragment : BindingFragment<FragmentLibraryBinding>() {
-    private lateinit var tabMediator: TabLayoutMediator
+    private var tabMediator: TabLayoutMediator? = null
 
     companion object {
         val TAB_NAMES = arrayOf(R.string.favorite_tracks, R.string.playlists)
@@ -30,11 +30,11 @@ class LibraryFragment : BindingFragment<FragmentLibraryBinding>() {
         tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = getString(TAB_NAMES[position])
         }
-        tabMediator.attach()
+        tabMediator?.attach()
     }
 
     override fun onDestroy() {
-        tabMediator.detach()
+        tabMediator?.detach()
         super.onDestroy()
     }
 }

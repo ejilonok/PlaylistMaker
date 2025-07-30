@@ -6,6 +6,8 @@ import android.net.NetworkCapabilities
 import com.ejilonok.playlistmaker.search.data.dto.Response
 import com.ejilonok.playlistmaker.search.data.dto.TracksSearchRequest
 import com.ejilonok.playlistmaker.search.domain.models.ResponseCode
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 
 class RetrofitItunesNetworkClient(
@@ -14,18 +16,17 @@ class RetrofitItunesNetworkClient(
 
     private val itunesService = retrofit.create(TrackITunesApiService::class.java)
 
-    override fun doRequest(dto: Any): Response {
-        return if (dto is TracksSearchRequest) {
-            try {
-                val resp = itunesService.searchTracks(dto.expression).execute()
-                val body = resp.body() ?: Response()
+    override suspend fun doRequest(dto: Any): Response {
+        if (dto !is TracksSearchRequest)
+            return Response().apply { resultCode = ResponseCode.NO_ANSWER.code }
 
-                body.apply { resultCode = resp.code() }
+        return withContext(Dispatchers.IO) {
+            try {
+                val resp = itunesService.searchTracks(dto.expression)
+                resp.apply { resultCode = ResponseCode.ALL_OK.code }
             } catch (e: Exception) {
                 Response().apply { resultCode = ResponseCode.NO_ANSWER.code }
             }
-        } else {
-            Response().apply { resultCode = ResponseCode.NO_ANSWER.code }
         }
     }
 

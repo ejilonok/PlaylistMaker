@@ -12,7 +12,6 @@ import com.ejilonok.playlistmaker.settings.domain.impl.ThemeInteractorImpl
 import com.ejilonok.playlistmaker.settings.presentation.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -39,6 +38,6 @@ val settingsModule = module {
     }
 
     viewModel {
-        SettingsViewModel(get(), get(), get { parametersOf(SettingsViewModel.CLICK_DEBOUNCE_DELAY) })
+        SettingsViewModel(get(), get())
     }
 }

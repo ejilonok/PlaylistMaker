@@ -1,26 +1,28 @@
 package com.ejilonok.playlistmaker.player.presentation
 
-import android.os.Handler
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ejilonok.playlistmaker.R
 import com.ejilonok.playlistmaker.main.domain.ResourceProvider
-import com.ejilonok.playlistmaker.main.presentation.common.ClickDebouncer
+import com.ejilonok.playlistmaker.main.presentation.common.debounce
 import com.ejilonok.playlistmaker.player.domain.api.interactor.PlayerInteractor
 import com.ejilonok.playlistmaker.player.domain.api.mapper.TrackSerializer
 import com.ejilonok.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class PlayerViewModel(
     resourceProvider: ResourceProvider,
     private val trackSerializer : TrackSerializer,
-    private val playerInteractor : PlayerInteractor,
-    private val mainHandler : Handler,
-    private val clickDebouncer : ClickDebouncer
+    private val playerInteractor : PlayerInteractor
 ) : ViewModel() {
+    lateinit var changeStateDebounce: () -> Unit
 
-    private val playerRunnable = Runnable { updateTime() }
+    private var updateStateJob : Job? = null
 
     private val playerState = MutableLiveData<PlayerState>(PlayerState.NoTrack)
     val playerStateLiveData : LiveData<PlayerState> = playerState
@@ -37,6 +39,10 @@ class PlayerViewModel(
 
     fun onCreate(params : String) {
         setTrack(params)
+
+        changeStateDebounce = debounce(CLICK_DEBOUNCE_DELAY, viewModelScope, false) {
+            changeState()
+        }
     }
 
     private fun setTrack(params : String) {
@@ -73,18 +79,19 @@ class PlayerViewModel(
     }
 
     private fun stopASync() {
-        clickDebouncer.clearCalls()
-        mainHandler.removeCallbacks(playerRunnable)
         playerInteractor.release()
     }
 
-    fun changeState() {
-        if (clickDebouncer.can()) {
-            when (playerInteractor.isPlaying()) {
-                true -> pause()
-                else -> play()
+    private fun changeState() {
+        updateStateJob?.cancel()
+        when (playerInteractor.isPlaying()) {
+            true -> pause()
+            else -> {
+                play()
+                updateStateJob = viewModelScope.launch {
+                    updateTime()
+                }
             }
-            updateTime()
         }
     }
 
@@ -100,16 +107,15 @@ class PlayerViewModel(
         }
     }
 
-    private fun updateTime() {
-        if (playerInteractor.isPlaying()) {
-            mainHandler.postDelayed(playerRunnable, DELAY_UPDATE)
+    private suspend fun updateTime() {
+        while (playerInteractor.isPlaying()) {
+            delay(DELAY_UPDATE)
+            currentTime.postValue(playerInteractor.getCurrentTimeString())
         }
-
-        currentTime.postValue(playerInteractor.getCurrentTimeString())
     }
 
     companion object {
-        const val CLICK_DEBOUNCE_DELAY = 600L
-        const val DELAY_UPDATE = 350L
+        const val CLICK_DEBOUNCE_DELAY = 150L
+        const val DELAY_UPDATE = 300L
     }
 }
