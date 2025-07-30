@@ -134,7 +134,11 @@ class SearchViewModel(
         // Сохраняем значение строки, чтобы сохранить по какому тексту выполнился последний запрос.
         // Даже если из другого потока изменится текст это не вызовет ошибку логики показа результатов последнего поиска
         val searchText = getSearchText()
-        tracksInteractor.searchTracks(searchText) { data -> getSearchResults(data) }
+        viewModelScope.launch {
+            tracksInteractor
+                .searchTracks(searchText)
+                .collect { data -> getSearchResults(data) }
+        }
         lastSearchText = searchText
     }
 
