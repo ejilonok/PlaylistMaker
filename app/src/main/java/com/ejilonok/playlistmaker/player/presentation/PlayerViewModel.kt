@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ejilonok.playlistmaker.R
+import com.ejilonok.playlistmaker.library.domain.api.interactor.FavoriteTrackInteractor
 import com.ejilonok.playlistmaker.main.domain.ResourceProvider
 import com.ejilonok.playlistmaker.main.presentation.common.debounce
 import com.ejilonok.playlistmaker.player.domain.api.interactor.PlayerInteractor
@@ -18,7 +19,8 @@ import kotlinx.coroutines.launch
 class PlayerViewModel(
     resourceProvider: ResourceProvider,
     private val trackSerializer : TrackSerializer,
-    private val playerInteractor : PlayerInteractor
+    private val playerInteractor : PlayerInteractor,
+    private val favoriteTrackInteractor: FavoriteTrackInteractor
 ) : ViewModel() {
     lateinit var changeStateDebounce: () -> Unit
 
@@ -35,6 +37,10 @@ class PlayerViewModel(
 
     private val startTimeString = resourceProvider.getString(R.string.default_preview_time)
     private val currentTime = MutableLiveData(startTimeString)
+
+    private val isFavorite = MutableLiveData(false)
+    val isFavoriteLiveData : LiveData<Boolean> = isFavorite
+
     val currentTimeLiveData : LiveData<String> = currentTime
 
     fun onCreate(params : String) {
@@ -53,16 +59,16 @@ class PlayerViewModel(
                 if (trackFromIntent != actualTrack) {
                     stopASync()
 
-                    loadTrack(trackFromIntent)
+                    bindTrack(trackFromIntent)
                 }
 
             }
-            is PlayerState.NoTrack -> loadTrack(trackFromIntent)
+            is PlayerState.NoTrack -> bindTrack(trackFromIntent)
             else -> {}
         }
     }
 
-    private fun loadTrack(track : Track) {
+    private fun bindTrack(track : Track) {
         playerState.postValue(PlayerState.Content.ShowContentNotReady(track))
         playerInteractor.setOnCompletionListener {
             currentTime.postValue(startTimeString)
@@ -72,6 +78,11 @@ class PlayerViewModel(
             playerState.postValue(PlayerState.Content.ShowContentPause(track))
         }
         playerInteractor.init(track.previewUrl)
+        viewModelScope.launch {
+            favoriteTrackInteractor.isTrackFavorite(track).collect {
+                isFavorite.postValue(it)
+            }
+        }
     }
 
     override fun onCleared() {
@@ -111,6 +122,19 @@ class PlayerViewModel(
         while (playerInteractor.isPlaying()) {
             delay(DELAY_UPDATE)
             currentTime.postValue(playerInteractor.getCurrentTimeString())
+        }
+    }
+
+    fun changeFavorite() {
+        viewModelScope.launch {
+            val actual_track = getActualTrack()
+            if ((isFavorite.value == null) || !(isFavorite.value!!)) {
+                favoriteTrackInteractor.addTrackToFavorite(actual_track)
+                isFavorite.postValue(true)
+            } else {
+                favoriteTrackInteractor.removeTrackFromFavorite(actual_track)
+                isFavorite.postValue(false)
+            }
         }
     }
 

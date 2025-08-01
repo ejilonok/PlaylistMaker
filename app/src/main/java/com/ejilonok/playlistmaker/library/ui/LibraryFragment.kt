@@ -30,6 +30,7 @@ class LibraryFragment : BindingFragment<FragmentLibraryBinding>() {
         tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = getString(TAB_NAMES[position])
         }
+
         tabMediator?.attach()
     }
 

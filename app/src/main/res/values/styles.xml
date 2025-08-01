@@ -33,17 +33,14 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:background">?attr/colorSecondary</item>
         <item name="android:orientation">vertical</item>
-        <item name="android:paddingStart">@dimen/main_padding</item>
-        <item name="android:paddingLeft">@dimen/main_padding</item>
-        <item name="android:paddingRight">@dimen/main_padding</item>
         <item name="android:layout_gravity">top</item>
     </style>
     <style name="OtherSecondaryTitle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingLeft">0dp</item>
-        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingLeft">@dimen/main_padding</item>
+        <item name="android:paddingBottom">@dimen/main_padding</item>
         <item name="android:textSize">@dimen/setting_title_text_size</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
         <item name="android:textFontWeight">500</item>
@@ -113,9 +110,11 @@
         <item name="android:layout_marginTop">8dp</item>>
         <item name="android:layout_marginBottom">8dp</item>
         <item name="android:paddingTop">9dp</item>
+        <item name="android:layout_marginStart">12dp</item>
         <item name="android:paddingStart">12dp</item>
         <item name="android:paddingBottom">8dp</item>
         <item name="android:paddingEnd">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
         <item name="android:background">@drawable/search_edit</item>
         <item name="android:backgroundTint">@color/YP_Light_Gray</item>
     </style>
@@ -187,7 +186,6 @@
         <item name="android:singleLine">true</item>
     </style>
     <style name="TabLayoutStyle">
-        <item name="android:textAlignment">center</item>
         <item name="tabMode">fixed</item>
         <item name="tabGravity">fill</item>
         <item name="tabTextColor">?attr/colorOnSecondary</item>
@@ -199,13 +197,10 @@
         <item name="tabIndicatorGravity">bottom</item>
         <item name="tabIndicatorAnimationMode">linear</item>
         <item name="tabIndicatorFullWidth">true</item>
-        <item name="tabPaddingStart">@dimen/main_padding</item>
-        <item name="tabPaddingEnd">@dimen/main_padding</item>
-    </style>
-    <style name="ViewPagerStyle">
-        <item name="android:paddingStart">@dimen/main_padding</item>
-        <item name="android:paddingEnd">@dimen/main_padding</item>
-        <item name="android:paddingBottom">@dimen/main_padding</item>
+        <item name="tabMinWidth">0dp</item> <!-- Разрешаем сжатие -->
+        <item name="tabMaxWidth">0dp</item> <!-- Убираем ограничение максимальной ширины -->
+        <item name="tabPaddingStart">16dp</item>
+        <item name="tabPaddingEnd">16dp</item>
     </style>
 
 </resources>
