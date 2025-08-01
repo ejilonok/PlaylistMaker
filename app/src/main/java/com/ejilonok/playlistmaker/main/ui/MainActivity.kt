@@ -7,6 +7,8 @@ import androidx.navigation.ui.setupWithNavController
 import com.ejilonok.playlistmaker.R
 import com.ejilonok.playlistmaker.databinding.ActivityMainBinding
 import com.ejilonok.playlistmaker.main.presentation.MainViewModel
+import com.ejilonok.playlistmaker.main.ui.common.gone
+import com.ejilonok.playlistmaker.main.ui.common.show
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
@@ -23,6 +25,21 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.main_fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.playerFragment -> hideBottomNavigation()
+                else -> showBottomNavigation()
+            }
+        }
+
         binding.bottomNavigationView.setupWithNavController(navController)
+    }
+
+    private fun hideBottomNavigation() {
+        binding.bottomNavigationView.gone()
+    }
+
+    private fun showBottomNavigation() {
+        binding.bottomNavigationView.show()
     }
 }

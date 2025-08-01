@@ -23,11 +23,6 @@ import org.koin.java.KoinJavaComponent
 
 class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
     private val playerViewModel: PlayerViewModel by viewModel()
-    companion object {
-        const val TRACK_TAG = "TRACK_JSON"
-        private val trackSerializer : TrackSerializer = KoinJavaComponent.getKoin().get()
-        fun createArgs(track: Track) = bundleOf(TRACK_TAG to trackSerializer.toString(track))
-    }
     override fun createBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
@@ -51,9 +46,13 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         playerViewModel.currentTimeLiveData.observe(viewLifecycleOwner) {
             binding.currentTimeTv.text = it
         }
+        playerViewModel.isFavoriteLiveData.observe(viewLifecycleOwner) {
+            binding.likeButton.setImageResource( if (it) FavoriteIcon.FAVORITE.resId else FavoriteIcon.NOT_FAVORITE.resId)
+        }
 
         binding.playButton.setOnClickListener { playerViewModel.changeStateDebounce() }
         binding.playerBackButton.setOnClickListener { findNavController().navigateUp() }
+        binding.likeButton.setOnClickListener { playerViewModel.changeFavorite() }
     }
 
     private fun renderState(state : PlayerState) {
@@ -146,5 +145,15 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
 
     private fun setPlayButtonEnabled(enabled : Boolean) {
         binding.playButton.isEnabled = enabled
+    }
+
+    companion object {
+        const val TRACK_TAG = "TRACK_JSON"
+        private val trackSerializer : TrackSerializer = KoinJavaComponent.getKoin().get()
+        fun createArgs(track: Track) = bundleOf(TRACK_TAG to trackSerializer.toString(track))
+        enum class FavoriteIcon(val resId: Int) {
+            FAVORITE(R.drawable.like_button_enabled),
+            NOT_FAVORITE(R.drawable.like_button_disabled)
+        }
     }
 }
