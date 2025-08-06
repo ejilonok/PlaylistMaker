@@ -3,9 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/SecondaryLayout"
-    android:paddingStart="@dimen/zero"
-    android:paddingLeft="@dimen/zero"
-    android:paddingRight="@dimen/zero"
     tools:context=".search.ui.SearchFragment">
 
     <LinearLayout
@@ -15,7 +12,10 @@
 
         <TextView
             style="@style/OtherSecondaryTitle"
-            android:text="@string/search" />
+            android:text="@string/search"
+            android:paddingStart="@dimen/main_padding"
+            android:paddingEnd="@dimen/main_padding"
+            />
 
         <FrameLayout
             android:layout_width="match_parent"

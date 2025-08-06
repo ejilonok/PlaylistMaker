@@ -6,7 +6,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".library.ui.FavoritesFragment">
 
-
         <TextView
         android:id="@+id/library_empty"
         android:layout_width="match_parent"
@@ -22,4 +21,25 @@
         <!-- Объект верстки для отображения списка треков добавлю позже, смотря теорию.
          Возможно, аккуратнее и правильнее будет использовать фрагмент со списком треков,
           такой же как в поиске -->
+        <ProgressBar android:id="@+id/library_progress_bar"
+            android:layout_width="@dimen/progress_bar_size"
+            android:layout_height="@dimen/progress_bar_size"
+            android:layout_marginTop="@dimen/progress_bar_margin"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/YP_Blue"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/library_empty"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_favorite_track_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="@dimen/main_padding"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintTop_toBottomOf="@id/library_progress_bar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
