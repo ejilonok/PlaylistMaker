@@ -6,28 +6,26 @@ import com.ejilonok.playlistmaker.library.data.dto.FavoriteTrackConverter
 import com.ejilonok.playlistmaker.library.domain.api.repository.FavoriteTrackRepository
 import com.ejilonok.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 
 class FavoriteTrackRepositoryImpl(
     private val appDatabase: AppDatabase,
     private val favoriteTrackConverter: FavoriteTrackConverter
 ) : FavoriteTrackRepository {
-    override fun favoriteTracks(): Flow<List<Track>> = flow {
-        try {
-            val favoriteTracks = appDatabase.favoriteTrackDao().getFavoriteTracks()
-            emit(convertFromFavoriteTracksEntity(favoriteTracks))
-        } catch (e : Exception) {
-            emit(convertFromFavoriteTracksEntity(listOf()))
+    override fun favoriteTracks(): Flow<List<Track>> =
+        appDatabase.favoriteTrackDao().getFavoriteTracks()
+        .map { favoriteTracks ->
+            convertFromFavoriteTracksEntity(favoriteTracks)
         }
-    }
+        .catch {
+            emit(emptyList()) // В случае ошибки возвращаем пустой список
+        }
 
-    override fun isTrackExist(track: Track) : Flow<Boolean> = flow {
-        try {
-            emit(appDatabase.favoriteTrackDao().getTrackById(track.trackId) != null )
-        } catch (e : Exception) {
-            emit(false)
-        }
-    }
+    override fun isTrackExist(track: Track) : Flow<Boolean> =
+        appDatabase.favoriteTrackDao().getTrackById(track.trackId)
+            .map { it != null }
+            .catch { emit(false) }
 
     private fun convertFromFavoriteTracksEntity(favoriteTracks: List<FavoriteTrackEntity>): List<Track> {
         return favoriteTracks.map { favoriteTrack -> favoriteTrackConverter.map(favoriteTrack) }
