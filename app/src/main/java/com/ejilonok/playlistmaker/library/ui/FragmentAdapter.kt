@@ -4,6 +4,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.ejilonok.playlistmaker.library.ui.favorites.FavoritesFragment
+import com.ejilonok.playlistmaker.library.ui.playlists.PlaylistListFragment
 
 
 class FragmentAdapter(

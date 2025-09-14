@@ -1,4 +1,4 @@
-package com.ejilonok.playlistmaker.library.presentation
+package com.ejilonok.playlistmaker.library.presentation.favorites
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

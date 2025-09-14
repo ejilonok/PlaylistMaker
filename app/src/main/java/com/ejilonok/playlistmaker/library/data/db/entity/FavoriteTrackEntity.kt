@@ -1,4 +1,4 @@
-package com.ejilonok.playlistmaker.library.data.db
+package com.ejilonok.playlistmaker.library.data.db.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

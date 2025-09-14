@@ -7,11 +7,11 @@ import com.ejilonok.playlistmaker.library.data.dto.FavoriteTrackConverter
 import com.ejilonok.playlistmaker.library.domain.api.interactor.FavoriteTrackInteractor
 import com.ejilonok.playlistmaker.library.domain.api.repository.FavoriteTrackRepository
 import com.ejilonok.playlistmaker.library.domain.impl.FavoriteTrackInteractorImpl
-import com.ejilonok.playlistmaker.library.presentation.FavoritesViewModel
+import com.ejilonok.playlistmaker.library.presentation.favorites.FavoritesViewModel
 import com.ejilonok.playlistmaker.library.presentation.LibraryViewModel
-import com.ejilonok.playlistmaker.library.ui.FavoritesFragment
-import com.ejilonok.playlistmaker.library.ui.PlaylistListFragment
-import com.ejilonok.playlistmaker.library.presentation.PlaylistListViewModel
+import com.ejilonok.playlistmaker.library.ui.favorites.FavoritesFragment
+import com.ejilonok.playlistmaker.library.ui.playlists.PlaylistListFragment
+import com.ejilonok.playlistmaker.library.presentation.playlists.PlaylistListViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module

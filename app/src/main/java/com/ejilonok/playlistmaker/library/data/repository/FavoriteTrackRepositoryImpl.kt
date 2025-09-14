@@ -1,7 +1,7 @@
 package com.ejilonok.playlistmaker.library.data.repository
 
 import com.ejilonok.playlistmaker.library.data.db.AppDatabase
-import com.ejilonok.playlistmaker.library.data.db.FavoriteTrackEntity
+import com.ejilonok.playlistmaker.library.data.db.entity.FavoriteTrackEntity
 import com.ejilonok.playlistmaker.library.data.dto.FavoriteTrackConverter
 import com.ejilonok.playlistmaker.library.domain.api.repository.FavoriteTrackRepository
 import com.ejilonok.playlistmaker.search.domain.models.Track

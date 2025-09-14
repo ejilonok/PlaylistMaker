@@ -1,4 +1,4 @@
-package com.ejilonok.playlistmaker.library.ui
+package com.ejilonok.playlistmaker.library.ui.favorites
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.ejilonok.playlistmaker.R
 import com.ejilonok.playlistmaker.databinding.FragmentFavoritesBinding
-import com.ejilonok.playlistmaker.library.presentation.FavoritesAction
-import com.ejilonok.playlistmaker.library.presentation.FavoritesState
-import com.ejilonok.playlistmaker.library.presentation.FavoritesViewModel
+import com.ejilonok.playlistmaker.library.presentation.favorites.FavoritesAction
+import com.ejilonok.playlistmaker.library.presentation.favorites.FavoritesState
+import com.ejilonok.playlistmaker.library.presentation.favorites.FavoritesViewModel
 import com.ejilonok.playlistmaker.main.ui.common.BindingFragment
 import com.ejilonok.playlistmaker.main.ui.common.*
 import com.ejilonok.playlistmaker.player.ui.PlayerFragment

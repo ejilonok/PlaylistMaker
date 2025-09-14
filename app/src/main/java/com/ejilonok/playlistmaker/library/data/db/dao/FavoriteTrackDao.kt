@@ -1,7 +1,7 @@
 package com.ejilonok.playlistmaker.library.data.db.dao
 
 import androidx.room.*
-import com.ejilonok.playlistmaker.library.data.db.FavoriteTrackEntity
+import com.ejilonok.playlistmaker.library.data.db.entity.FavoriteTrackEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -1,4 +1,4 @@
-package com.ejilonok.playlistmaker.library.presentation
+package com.ejilonok.playlistmaker.library.presentation.playlists
 
 import androidx.lifecycle.ViewModel
 

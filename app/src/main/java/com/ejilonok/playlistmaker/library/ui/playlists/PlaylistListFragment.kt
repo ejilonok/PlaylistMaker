@@ -1,9 +1,9 @@
-package com.ejilonok.playlistmaker.library.ui
+package com.ejilonok.playlistmaker.library.ui.playlists
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.ejilonok.playlistmaker.databinding.FragmentPlaylistListBinding
-import com.ejilonok.playlistmaker.library.presentation.PlaylistListViewModel
+import com.ejilonok.playlistmaker.library.presentation.playlists.PlaylistListViewModel
 import com.ejilonok.playlistmaker.main.ui.common.BindingFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
