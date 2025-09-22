@@ -9,10 +9,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistListFragment : BindingFragment<FragmentPlaylistListBinding>() {
 
-    companion object {
-        fun newInstance() = PlaylistListFragment()
-    }
-
     /* Оставляю для будущей бизнес-логики*/
     private val viewModel: PlaylistListViewModel by viewModel()
 
@@ -23,4 +19,7 @@ class PlaylistListFragment : BindingFragment<FragmentPlaylistListBinding>() {
         return FragmentPlaylistListBinding.inflate(inflater, container, false)
     }
 
+    companion object {
+        fun newInstance() = PlaylistListFragment()
+    }
 }

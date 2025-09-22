@@ -50,7 +50,7 @@ class FavoritesFragment : BindingFragment<FragmentFavoritesBinding>() {
             when (action) {
                 is FavoritesAction.GotoPlayerAction -> {
                     findNavController().navigate(
-                    R.id.action_libraryFragment_to_playerFragment,
+                    R.id.action_favoritesFragment_to_playerFragment,
                     PlayerFragment.createArgs(action.track))}
                 else -> {}
             }

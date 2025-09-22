@@ -5,6 +5,11 @@
     android:id="@+id/main_navigation_graph"
     app:startDestination="@id/libraryFragment">
     <fragment
+        android:id="@+id/libraryFragment"
+        android:name="com.ejilonok.playlistmaker.library.ui.LibraryFragment"
+        android:label="fragment_library"
+        tools:layout="@layout/fragment_library" />
+    <fragment
         android:id="@+id/searchFragment"
         android:name="com.ejilonok.playlistmaker.search.ui.SearchFragment"
         android:label="fragment_search"
@@ -14,22 +19,40 @@
             app:destination="@id/playerFragment" />
     </fragment>
     <fragment
-        android:id="@+id/libraryFragment"
-        android:name="com.ejilonok.playlistmaker.library.ui.LibraryFragment"
-        android:label="fragment_library"
-        tools:layout="@layout/fragment_library" >
-        <action
-            android:id="@+id/action_libraryFragment_to_playerFragment"
-            app:destination="@id/playerFragment" />
-    </fragment>
-    <fragment
         android:id="@+id/playerFragment"
         android:name="com.ejilonok.playlistmaker.player.ui.PlayerFragment"
         android:label="fragment_player"
-        tools:layout="@layout/fragment_player" />
+        tools:layout="@layout/fragment_player" >
+        <action
+            android:id="@+id/action_playerFragment_to_playlistMakerFragment"
+            app:destination="@id/playlistMakerFragment" />
+    </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.ejilonok.playlistmaker.settings.ui.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/playlistListFragment"
+        android:name="com.ejilonok.playlistmaker.library.ui.playlists.PlaylistListFragment"
+        android:label="fragment_playlist_list"
+        tools:layout="@layout/fragment_playlist_list" >
+        <action
+            android:id="@+id/action_playlistListFragment_to_playlistMakerFragment"
+            app:destination="@id/playlistMakerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/favoritesFragment"
+        android:name="com.ejilonok.playlistmaker.library.ui.favorites.FavoritesFragment"
+        android:label="fragment_favorites"
+        tools:layout="@layout/fragment_favorites" >
+        <action
+            android:id="@+id/action_favoritesFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/playlistMakerFragment"
+        android:name="com.ejilonok.playlistmaker.library.ui.PlaylistMakerFragment"
+        android:label="fragment_playlist_maker"
+        tools:layout="@layout/fragment_playlist_maker" />
 </navigation>

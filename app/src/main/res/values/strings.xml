@@ -33,5 +33,9 @@
     <string name="empty_playlist_list">Вы не создали\nни одного плейлиста</string>
     <string name="new_playlist">Новый плейлист</string>
     <string name="favorite_tracks">Избранные треки</string>
+    <!-- Плейлисты -->
     <string name="playlists">Плейлисты</string>
+    <string name="playlist_title_hint">Название*</string>
+    <string name="playlist_descr">Описание</string>
+    <string name="create">Создать</string>
 </resources>

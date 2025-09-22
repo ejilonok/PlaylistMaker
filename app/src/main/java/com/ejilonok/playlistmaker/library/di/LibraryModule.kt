@@ -4,14 +4,24 @@ import androidx.room.Room
 import com.ejilonok.playlistmaker.library.data.repository.FavoriteTrackRepositoryImpl
 import com.ejilonok.playlistmaker.library.data.db.AppDatabase
 import com.ejilonok.playlistmaker.library.data.dto.FavoriteTrackConverter
+import com.ejilonok.playlistmaker.library.data.dto.PlaylistConverter
+import com.ejilonok.playlistmaker.library.data.repository.ImageRepositoryImpl
+import com.ejilonok.playlistmaker.library.data.repository.PlaylistRepositoryImpl
+import com.ejilonok.playlistmaker.library.domain.api.interactor.CoverInteractor
 import com.ejilonok.playlistmaker.library.domain.api.interactor.FavoriteTrackInteractor
+import com.ejilonok.playlistmaker.library.domain.api.interactor.PlaylistInteractor
 import com.ejilonok.playlistmaker.library.domain.api.repository.FavoriteTrackRepository
+import com.ejilonok.playlistmaker.library.domain.api.repository.ImageRepository
+import com.ejilonok.playlistmaker.library.domain.api.repository.PlaylistRepository
+import com.ejilonok.playlistmaker.library.domain.impl.CoverInteractorImpl
 import com.ejilonok.playlistmaker.library.domain.impl.FavoriteTrackInteractorImpl
+import com.ejilonok.playlistmaker.library.domain.impl.PlaylistInteractorImpl
 import com.ejilonok.playlistmaker.library.presentation.favorites.FavoritesViewModel
 import com.ejilonok.playlistmaker.library.presentation.LibraryViewModel
 import com.ejilonok.playlistmaker.library.ui.favorites.FavoritesFragment
 import com.ejilonok.playlistmaker.library.ui.playlists.PlaylistListFragment
 import com.ejilonok.playlistmaker.library.presentation.playlists.PlaylistListViewModel
+import com.ejilonok.playlistmaker.library.presentation.playlists.PlaylistMakerViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -27,6 +37,10 @@ val libraryModule = module {
 
     viewModel {
         PlaylistListViewModel()
+    }
+
+    viewModel {
+        PlaylistMakerViewModel( get() )
     }
 
     factory<PlaylistListFragment> {
@@ -51,5 +65,25 @@ val libraryModule = module {
 
     factory<FavoriteTrackInteractor> {
         FavoriteTrackInteractorImpl( get() )
+    }
+
+    factory {
+        PlaylistConverter()
+    }
+
+    factory<PlaylistRepository> {
+        PlaylistRepositoryImpl( get(), get() )
+    }
+
+    factory<PlaylistInteractor> {
+        PlaylistInteractorImpl( get() )
+    }
+
+    factory<ImageRepository> {
+        ImageRepositoryImpl(androidContext(), androidContext().contentResolver)
+    }
+
+    factory<CoverInteractor> {
+        CoverInteractorImpl( get() )
     }
 }
