@@ -205,7 +205,7 @@
 
     <!-- Стили фрагмента playlist maker -->
     <style name="NewPlaylistEdit">
-        <item name="android:height">56dp</item>
+        <item name="android:layout_height">56dp</item>
         <item name="android:lines">1</item>
         <item name="android:maxLines">1</item>
         <item name="android:layout_marginTop">@dimen/main_padding</item>
