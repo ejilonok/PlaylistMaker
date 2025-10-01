@@ -22,6 +22,7 @@ import com.ejilonok.playlistmaker.library.ui.favorites.FavoritesFragment
 import com.ejilonok.playlistmaker.library.ui.playlists.PlaylistListFragment
 import com.ejilonok.playlistmaker.library.presentation.playlists.PlaylistListViewModel
 import com.ejilonok.playlistmaker.library.presentation.playlists.PlaylistMakerViewModel
+import com.ejilonok.playlistmaker.library.ui.PlaylistMakerFragment
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -45,6 +46,10 @@ val libraryModule = module {
 
     factory<PlaylistListFragment> {
         PlaylistListFragment.newInstance()
+    }
+
+    factory<PlaylistMakerFragment> {
+        PlaylistMakerFragment.newInstance()
     }
 
     single {
