@@ -49,10 +49,10 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             when (screenState.state) {
                 is SearchUiState.Content -> showSearchResult(screenState.state.tracks)
                 is SearchUiState.History -> showHistory(screenState.state.tracks)
-                SearchUiState.Waiting -> showEmptyScreen()
-                SearchUiState.Loading -> showLoading()
-                SearchUiState.EmptySearchResult -> showEmptySearchResult()
-                SearchUiState.ServerError -> showServerError()
+                is SearchUiState.Waiting -> showEmptyScreen()
+                is SearchUiState.Loading -> showLoading()
+                is SearchUiState.EmptySearchResult -> showEmptySearchResult()
+                is SearchUiState.ServerError -> showServerError()
             }
 
             binding.clearButton.setVisible(screenState.common.canClearSearch)
